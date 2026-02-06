@@ -19,12 +19,14 @@ import {
   ThumbsUp, TrendingUp as TrendingUpIcon, ArrowRight,
   ArrowUpRight, Users as UsersIcon, CircleDollarSign,
   Building as BuildingIcon, Target as TargetIcon,
-  Award as AwardIcon, Globe as GlobeIcon, Send
+  Award as AwardIcon, Globe as GlobeIcon, Send,
+  FileDown
 } from 'lucide-react';
 
 // Components
 import ReLinkLogo from '../assets/RelinkLOGO.jpeg';
 import BotServiceLogo from '../assets/RelinkLOGO.jpeg'; // Using same logo for bot service
+import IntroVideo from '../assets/intro-video.mp4'; // You'll need to add this video file
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -65,6 +67,10 @@ const LandingPage = () => {
     communities: 0,
     trainingHours: 0
   });
+  const [isNavHovered, setIsNavHovered] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Data Arrays
   const heroTitles = [
@@ -174,7 +180,7 @@ const LandingPage = () => {
   const statsRef = useRef(null);
   const heroRef = useRef(null);
   const chatbotRef = useRef(null);
-  const timelineRef = useRef(null);
+  const videoRef = useRef(null);
 
   // Title Rotation Effect
   useEffect(() => {
@@ -197,7 +203,17 @@ const LandingPage = () => {
     setParticles(newParticles);
   }, []);
 
-  // Stats Animation - Enhanced
+  // Scroll detection for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Stats Animation - Enhanced with mock data
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -321,9 +337,24 @@ const LandingPage = () => {
     navigate('/signin');
   };
 
+  const handleWatchIntro = () => {
+    setIsVideoModalOpen(true);
+  };
+
+  const handleViewBrochure = () => {
+    setIsBrochureModalOpen(true);
+  };
+
   // Bot Logo Handler
   const handleBotLogoClick = () => {
     setBotActive(!botActive);
+  };
+
+  // Handle video play
+  const handleVideoPlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
   };
 
   // Loading Simulation
@@ -358,8 +389,12 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* Navigation */}
-      <nav className="navbar">
+      {/* Navigation - Hidden by default, shows on hover or scroll */}
+      <nav 
+        className={`navbar ${isNavHovered || isScrolled ? 'active' : ''}`}
+        onMouseEnter={() => setIsNavHovered(true)}
+        onMouseLeave={() => setIsNavHovered(false)}
+      >
         <div className="nav-container">
           <div 
             className="logo-container"
@@ -487,6 +522,7 @@ const LandingPage = () => {
             support for sustainable reintegration.
           </p>
 
+          {/* Updated 4-Button Layout */}
           <div className="hero-actions">
             <button className="btn-primary" onClick={handleRegister}>
               <Rocket size={20} />
@@ -494,11 +530,15 @@ const LandingPage = () => {
               <ArrowRight size={18} />
               <div className="btn-shine"></div>
             </button>
-            <button className="btn-secondary" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>
+            <button className="btn-secondary" onClick={handleWatchIntro}>
               <Play size={20} />
               <span>Watch Introduction</span>
             </button>
-            <button className="btn-tertiary" onClick={handleSignIn}>
+            <button className="btn-tertiary" onClick={handleViewBrochure}>
+              <FileDown size={20} />
+              <span>View Brochure</span>
+            </button>
+            <button className="btn-quaternary" onClick={handleSignIn}>
               <LogOut size={20} />
               <span>Member Sign In</span>
             </button>
@@ -962,6 +1002,101 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Modals */}
+      {/* Video Introduction Modal */}
+      {isVideoModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsVideoModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Welcome to RE-Link</h3>
+              <button className="modal-close" onClick={() => setIsVideoModalOpen(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="video-container">
+                <video 
+                  ref={videoRef}
+                  controls
+                  className="intro-video"
+                  poster="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                >
+                  <source src={IntroVideo} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div className="modal-description">
+                <h4>About Our Platform</h4>
+                <p>RE-Link is dedicated to connecting rehabilitated individuals with meaningful employment opportunities across South Africa. Our comprehensive platform provides job matching, skills development, mentorship, and community support.</p>
+                <div className="video-details">
+                  <div className="video-detail">
+                    <Clock size={16} />
+                    <span>Duration: 3:45</span>
+                  </div>
+                  <div className="video-detail">
+                    <Calendar size={16} />
+                    <span>Updated: January 2024</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Brochure Modal */}
+      {isBrochureModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsBrochureModalOpen(false)}>
+          <div className="modal-content brochure-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>RE-Link Brochure</h3>
+              <button className="modal-close" onClick={() => setIsBrochureModalOpen(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="brochure-content">
+                <div className="brochure-cover">
+                  <div className="brochure-logo">
+                    <img src={ReLinkLogo} alt="RE-Link" />
+                  </div>
+                  <h2>RE-LINK</h2>
+                  <p className="brochure-tagline">Second Chances, Real Connections</p>
+                </div>
+                
+                <div className="brochure-section">
+                  <h4><TargetIcon size={20} /> Our Vision</h4>
+                  <p>To create a South Africa where every rehabilitated individual has equal access to meaningful employment, dignity, and the opportunity to contribute positively to society.</p>
+                </div>
+                
+                <div className="brochure-section">
+                  <h4><AwardIcon size={20} /> Our Mission</h4>
+                  <p>To bridge the gap between rehabilitation and reintegration by providing comprehensive employment solutions, skills development, and community support that empowers individuals to rebuild their lives with dignity and purpose.</p>
+                </div>
+                
+                <div className="brochure-section">
+                  <h4><GlobeIcon size={20} /> Core Values</h4>
+                  <ul>
+                    <li><Check size={16} /> <strong>Empathy:</strong> Understanding every individual's unique journey</li>
+                    <li><Check size={16} /> <strong>Integrity:</strong> Operating with transparency and honesty</li>
+                    <li><Check size={16} /> <strong>Inclusion:</strong> Creating opportunities for all</li>
+                    <li><Check size={16} /> <strong>Sustainability:</strong> Building lasting solutions</li>
+                    <li><Check size={16} /> <strong>Excellence:</strong> Delivering quality services</li>
+                  </ul>
+                </div>
+                
+                <div className="brochure-download">
+                  <button className="download-btn">
+                    <DownloadCloud size={20} />
+                    <span>Download Full Brochure (PDF)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bot Service Logo Button - Bottom Right */}
       <div 
