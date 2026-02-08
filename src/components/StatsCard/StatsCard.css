@@ -1,0 +1,91 @@
+.stats-card {
+  background-color: rgb(255, 255, 255);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+  flex: 1;
+  min-width: 200px;
+}
+
+.stats-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.stats-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.stats-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  color: #10b981;
+}
+
+.stats-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.stats-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.stats-trend {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.stats-trend.up {
+  background-color: #ecfdf5;
+  color: #065f46;
+}
+
+.stats-trend.down {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+.trend-icon {
+  margin-right: 4px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .stats-card {
+    min-width: 150px;
+    padding: 16px;
+  }
+
+  .stats-value {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-card {
+    min-width: 100%;
+    margin-bottom: 16px;
+  }
+}

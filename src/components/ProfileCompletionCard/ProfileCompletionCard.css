@@ -1,0 +1,121 @@
+.profile-completion-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+  width: 100%;
+  max-width: 750px; /* Optional max width */
+  box-sizing: border-box; /* Ensure padding is inside */
+}
+
+.profile-completion-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.completion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.completion-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.completion-percentage {
+  font-size: 24px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.progress-wrapper {
+  width: 100%;
+  padding: 2px 0; /* Keeps progress bar inside card */
+  margin-bottom: 16px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 0%;
+  width: 0%;
+  background: linear-gradient(90deg, #34d399, #059669);
+  border-radius: 6px;
+  transition: width 1s ease-in-out;
+}
+
+.completion-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.tasks-list {
+  margin-bottom: 16px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.task-status {
+  font-size: 16px;
+  margin-right: 12px;
+  width: 20px;
+  text-align: center;
+}
+
+.task-status.completed {
+  color: #10b981;
+}
+
+.task-status.pending {
+  color: #9ca3af;
+}
+
+.task-label {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.task-label.completed {
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+.complete-profile-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.complete-profile-button:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .profile-completion-card {
+    padding: 16px;
+  }
+}

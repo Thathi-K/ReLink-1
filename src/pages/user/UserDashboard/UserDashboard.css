@@ -1,0 +1,108 @@
+/* =========================
+   User Dashboard
+========================= */
+
+.user-dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: 0px; /* topbar height */
+  box-sizing: border-box;
+}
+
+.user-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;   /* aligns with sidebar */
+  padding-top: 8px;      /* tight to topbar */
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column; /* stack header, stats, content */
+  align-items: stretch;   /* children stretch full width */
+  gap: 20px;              /* consistent vertical spacing */
+}
+
+
+
+.user-dashboard-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;               /* space between title and subtitle */
+}
+
+.user-dashboard-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.user-dashboard-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* Stats Row */
+.stats-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Main Content Grid */
+.user-dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  align-items: start; /* top-align cards */
+}
+
+.content-left,
+.content-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* space between stacked cards */
+}
+
+.spacer {
+  height: 30px;
+}
+
+/* =========================
+   Responsive Adjustments
+========================= */
+@media (max-width: 1200px) {
+  .user-dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-dashboard {
+    padding-left: 0;    /* sidebar collapsed */
+    padding-top: 120px; /* adjust for topbar height on mobile */
+  }
+
+  .user-dashboard-title {
+    font-size: 24px;
+  }
+
+  .stats-row {
+    gap: 15px;
+  }
+
+  .user-dashboard-content {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-dashboard-title {
+    font-size: 20px;
+  }
+
+  .user-dashboard-subtitle {
+    font-size: 14px;
+  }
+}

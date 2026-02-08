@@ -220,7 +220,7 @@ function Login() {
       
       // Redirect to Home after 1.5 seconds
       setTimeout(() => {
-        navigate('/home');
+        navigate('/dashboard');
       }, 1500);
       
       setIsLoading(false);
