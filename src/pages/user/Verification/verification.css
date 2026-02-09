@@ -1,0 +1,126 @@
+/* Layout */
+.verification-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #F0FDF4;
+}
+
+/* Sidebar */
+.verification-layout-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #fff;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+  z-index: 100;
+}
+
+/* Main area */
+.verification-layout-main {
+  margin-left: 200px; /* same as sidebar width */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* TopBar */
+.verification-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: #16A34A;
+  color: #fff;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Content */
+.verification-content {
+  flex: 1;
+  padding: 32px 24px;
+}
+
+/* Tabs */
+.verification-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid #D1FAE5;
+  margin-bottom: 24px;
+}
+
+.verification-tab {
+  padding: 12px 24px;
+  font-weight: 500;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.verification-tab:hover {
+  color: #059669;
+}
+
+.verification-tab.active {
+  border-bottom-color: #059669;
+  color: #059669 !important;
+}
+
+/* Admin spinner */
+.loading-spinner {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #16A34A;
+  border-top-color: transparent;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Admin docs container */
+.admin-docs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .verification-layout {
+    flex-direction: column;
+  }
+
+  .verification-layout-sidebar {
+    width: 100%;
+    position: relative;
+  }
+
+  .verification-layout-main {
+    margin-left: 0;
+  }
+
+  .verification-topbar {
+    position: relative;
+  }
+
+  .verification-content {
+    padding: 16px;
+  }
+}

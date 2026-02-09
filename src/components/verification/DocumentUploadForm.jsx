@@ -13,7 +13,6 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
     expiryDate: ''
   });
 
-  // Suggested document types based on your ERD
   const documentTypes = [
     { value: 'ID_CARD', label: 'ID Card', required: true },
     { value: 'PASSPORT', label: 'Passport', required: false },
@@ -29,21 +28,18 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
     { value: 'OTHER', label: 'Other Document', required: false }
   ];
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    
     if (!file) return;
 
-    // Check if it's a PDF
     if (file.type !== 'application/pdf') {
       alert('Please upload a PDF file only');
       e.target.value = '';
       return;
     }
 
-    // Check file size
     if (file.size > MAX_FILE_SIZE) {
       alert('File size must be less than 5MB');
       e.target.value = '';
@@ -51,8 +47,6 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
     }
 
     setSelectedFile(file);
-    
-    // Convert to base64 or upload to server
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData({ ...formData, file: reader.result });
@@ -72,7 +66,6 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
     setUploadProgress(0);
 
     try {
-      // Simulate upload progress
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           if (prev >= 90) {
@@ -90,7 +83,6 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
       
       setTimeout(() => {
         alert('Document submitted successfully! ✅');
-        // Reset form
         setFormData({ docName: '', docType: 'ID_CARD', file: '', expiryDate: '' });
         setSelectedFile(null);
         setUploadProgress(0);
@@ -111,17 +103,36 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Required Documents Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-blue-900 flex items-center gap-2 mb-3">
+    <div className="space-y-6 bg-white p-6">
+      {/* Required Documents Box */}
+      <div style={{
+        backgroundColor: '#EFF6FF',
+        border: '2px solid #BFDBFE',
+        borderRadius: '8px',
+        padding: '24px'
+      }}>
+        <h2 style={{
+          fontSize: '18px',
+          fontWeight: '600',
+          color: '#1E3A8A',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
           <AlertCircle className="w-5 h-5" />
           Required Documents
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-800">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '8px',
+          fontSize: '14px',
+          color: '#1E40AF'
+        }}>
           {documentTypes.filter(doc => doc.required).map(doc => (
-            <div key={doc.value} className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-blue-600" />
+            <div key={doc.value} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CheckCircle className="w-4 h-4" style={{ color: '#2563EB' }} />
               {doc.label}
             </div>
           ))}
@@ -129,24 +140,52 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
       </div>
 
       {/* Upload Form */}
-      <div className="bg-white rounded-lg shadow-md p-6 border border-green-100">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <Upload className="w-6 h-6 text-green-600" />
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+        padding: '24px',
+        border: '1px solid #D1FAE5'
+      }}>
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#1F2937',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <Upload className="w-6 h-6" style={{ color: '#059669' }} />
           Upload New Document
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* Document Type Selection */}
+          {/* Document Type */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
               Document Type *
             </label>
             <select
               value={formData.docType}
               onChange={(e) => setFormData({ ...formData, docType: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               required
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #D1D5DB',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                color: '#111827',
+                fontSize: '16px'
+              }}
             >
               {documentTypes.map(doc => (
                 <option key={doc.value} value={doc.value}>
@@ -158,50 +197,85 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
 
           {/* Document Name */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
               Document Name *
             </label>
             <input
               type="text"
               value={formData.docName}
               onChange={(e) => setFormData({ ...formData, docName: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               placeholder="e.g., My National ID Card"
               required
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #D1D5DB',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                color: '#111827',
+                fontSize: '16px'
+              }}
             />
           </div>
 
-          {/* File Upload Area */}
+          {/* File Upload */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
               Upload PDF Document * (Max 5MB)
             </label>
             
             {!selectedFile ? (
-              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-green-300 rounded-lg cursor-pointer bg-green-50 hover:bg-green-100 transition-all">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Upload className="w-10 h-10 text-green-600 mb-3" />
-                  <p className="mb-2 text-sm text-gray-700 font-medium">
-                    <span className="text-green-600">Click to upload</span> or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">PDF only (MAX. 5MB)</p>
-                </div>
+              <label style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '160px',
+                border: '2px dashed #10B981',
+                borderRadius: '8px',
+                backgroundColor: '#ECFDF5',
+                cursor: 'pointer',
+                transition: 'all 0.3s'
+              }}>
+                <Upload className="w-10 h-10" style={{ color: '#059669', marginBottom: '12px' }} />
+                <p style={{ fontSize: '14px', color: '#374151', fontWeight: '500', marginBottom: '4px' }}>
+                  <span style={{ color: '#059669' }}>Click to upload</span> or drag and drop
+                </p>
+                <p style={{ fontSize: '12px', color: '#6B7280' }}>PDF only (MAX. 5MB)</p>
                 <input
                   type="file"
-                  className="hidden"
                   accept="application/pdf"
                   onChange={handleFileChange}
                   required
+                  style={{ display: 'none' }}
                 />
               </label>
             ) : (
-              <div className="border-2 border-green-300 rounded-lg p-4 bg-green-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-8 h-8 text-green-600" />
+              <div style={{
+                border: '2px solid #10B981',
+                borderRadius: '8px',
+                padding: '16px',
+                backgroundColor: '#ECFDF5'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <FileText className="w-8 h-8" style={{ color: '#059669' }} />
                     <div>
-                      <p className="font-medium text-gray-800">{selectedFile.name}</p>
-                      <p className="text-sm text-gray-500">
+                      <p style={{ fontWeight: '500', color: '#1F2937' }}>{selectedFile.name}</p>
+                      <p style={{ fontSize: '14px', color: '#6B7280' }}>
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -209,22 +283,35 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
                   <button
                     type="button"
                     onClick={removeFile}
-                    className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                    style={{
+                      padding: '8px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      borderRadius: '8px'
+                    }}
                   >
-                    <X className="w-5 h-5 text-red-600" />
+                    <X className="w-5 h-5" style={{ color: '#DC2626' }} />
                   </button>
                 </div>
                 
-                {/* Upload Progress Bar */}
                 {uploadProgress > 0 && (
-                  <div className="mt-3">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
+                  <div style={{ marginTop: '12px' }}>
+                    <div style={{
+                      width: '100%',
+                      height: '8px',
+                      backgroundColor: '#E5E7EB',
+                      borderRadius: '9999px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        width: `${uploadProgress}%`,
+                        height: '100%',
+                        backgroundColor: '#059669',
+                        transition: 'width 0.3s'
+                      }}></div>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1 text-center">
+                    <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px', textAlign: 'center' }}>
                       {uploadProgress}% uploaded
                     </p>
                   </div>
@@ -233,16 +320,30 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
             )}
           </div>
 
-          {/* Expiry Date (Optional) */}
+          {/* Expiry Date */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
               Expiry Date (if applicable)
             </label>
             <input
               type="date"
               value={formData.expiryDate}
               onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #D1D5DB',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                color: '#111827',
+                fontSize: '16px'
+              }}
             />
           </div>
 
@@ -250,15 +351,29 @@ const DocumentUploadForm = ({ userId, onSuccess }) => {
           <button
             type="submit"
             disabled={loading || !selectedFile}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
+            style={{
+              width: '100%',
+              padding: '16px',
+              backgroundColor: loading || !selectedFile ? '#9CA3AF' : '#059669',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: loading || !selectedFile ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            }}
           >
             <Upload className="w-5 h-5" />
             {loading ? 'Uploading...' : 'Submit Document'}
           </button>
         </form>
 
-        {/* Help Text */}
-        <div className="mt-4 text-center text-xs text-gray-500">
+        <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '12px', color: '#6B7280' }}>
           <p>Your documents are encrypted and stored securely</p>
         </div>
       </div>

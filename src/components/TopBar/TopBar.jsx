@@ -16,10 +16,10 @@ const TopBar = () => {
 
   return (
     <header className="topbar">
-      {/* Left: Welcome + username */}
+      
       <div className="topbar-left">
-        <span className="welcome-text">Welcome</span>
-        <span className="username">Marcus!</span>
+        <span className="welcome-text"></span>
+        <span className="username"></span>
       </div>
 
       {/* Right: Search + Notification */}

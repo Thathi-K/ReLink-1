@@ -24,9 +24,9 @@ import {
 } from 'lucide-react';
 
 // Components
-import ReLinkLogo from '../assets/RelinkLOGO.jpeg';
-import BotServiceLogo from '../assets/RelinkLOGO.jpeg';
-import IntroVideo from '../assets/intro-video.mp4';
+import ReLinkLogo from '../../assets/RelinkLOGO.jpeg';
+import BotServiceLogo from '../../assets/RelinkLOGO.jpeg';
+import IntroVideo from '../../assets/intro-video.mp4';
 
 const LandingPage = () => {
   const navigate = useNavigate();

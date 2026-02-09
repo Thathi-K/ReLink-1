@@ -1,9 +1,10 @@
 .mentors-page {
+  max-width: 1400px;
   margin-left: 200px; 
   margin-top: 0px;   
   padding: 10px;
   min-height: calc(100vh - 60px);
-  background-color: #f5f7fa; /* soft neutral background */
+  background-color: #F0FDF4; /* soft neutral background */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Ubuntu', 'Cantarell', sans-serif;
 }
 

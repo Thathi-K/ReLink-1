@@ -1,41 +1,32 @@
-import { Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import DocumentCard from './DocumentCard';
 
-const StatusBadge = ({ status }) => {
-  const config = {
-    PENDING: {
-      bg: 'bg-yellow-100',
-      text: 'text-yellow-800',
-      border: 'border-yellow-300',
-      icon: <Clock className="w-4 h-4" />
-    },
-    APPROVED: {
-      bg: 'bg-green-100',
-      text: 'text-green-800',
-      border: 'border-green-300',
-      icon: <CheckCircle className="w-4 h-4" />
-    },
-    REJECTED: {
-      bg: 'bg-red-100',
-      text: 'text-red-800',
-      border: 'border-red-300',
-      icon: <XCircle className="w-4 h-4" />
-    },
-    UNDER_REVIEW: {
-      bg: 'bg-blue-100',
-      text: 'text-blue-800',
-      border: 'border-blue-300',
-      icon: <AlertCircle className="w-4 h-4" />
-    }
-  };
+const DocumentList = ({ documents, loading, onDelete }) => {
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="animate-spin w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full mx-auto"></div>
+        <p className="text-gray-500 mt-4">Loading...</p>
+      </div>
+    );
+  }
 
-  const c = config[status];
+  if (documents.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-12 text-center border border-green-100">
+        <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <p className="text-gray-500 text-lg">No documents yet</p>
+      </div>
+    );
+  }
 
   return (
-    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border ${c.bg} ${c.text} ${c.border}`}>
-      {c.icon}
-      {status.replace('_', ' ')}
-    </span>
+    <div className="space-y-4">
+      {documents.map((doc) => (
+        <DocumentCard key={doc.docId} document={doc} onDelete={onDelete} />
+      ))}
+    </div>
   );
 };
 
-export default StatusBadge;
+export default DocumentList;

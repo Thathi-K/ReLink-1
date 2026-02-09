@@ -11,13 +11,12 @@
 }
 
 .user-dashboard {
-  max-width: 1200px;
+  display: flex;
   margin: 0 auto;
   padding-left: 20px;   /* aligns with sidebar */
   padding-top: 8px;      /* tight to topbar */
   box-sizing: border-box;
-
-  display: flex;
+  background-color: #F0FDF4;
   flex-direction: column; /* stack header, stats, content */
   align-items: stretch;   /* children stretch full width */
   gap: 20px;              /* consistent vertical spacing */

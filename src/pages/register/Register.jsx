@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
 
 // Import your logo
-import ReLinkLogo from "../assets/RelinkLOGO.jpeg";
+import ReLinkLogo from "../../assets/RelinkLOGO.jpeg";
 
 function Register() {
   const navigate = useNavigate();
@@ -456,7 +456,7 @@ function Register() {
       // Simulate successful registration
       setTimeout(() => {
         setLoading(false);
-        navigate("/login", { 
+        navigate("/signin", { 
           state: { 
             message: "Registration successful! Please sign in.",
             email: formData.email,
@@ -549,7 +549,7 @@ function Register() {
           <div className="header-right">
             <div className="login-prompt">
               <span className="prompt-text">Already have an account?</span>
-              <Link to="/login" className="login-link">
+              <Link to="/signin" className="login-link">
                 <LogOut size={16} />
                 <span>Sign In</span>
                 <ArrowUpRight size={14} />

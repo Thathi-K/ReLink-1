@@ -1,3 +1,5 @@
+// For their page
+
 import React from 'react';
 import Sidebar from '../../../components/Sidebar/Sidebar.jsx';
 import TopBar from '../../../components/TopBar/TopBar.jsx';

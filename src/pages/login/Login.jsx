@@ -10,7 +10,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Login.css";
 
 // Import your logo
-import ReLinkLogo from "../assets/RelinkLOGO.jpeg";
+import ReLinkLogo from "../../assets/RelinkLOGO.jpeg";
 
 function Login() {
   const navigate = useNavigate();

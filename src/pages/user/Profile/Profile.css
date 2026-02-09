@@ -18,10 +18,11 @@
 }
 
 .profile-page {
-  max-width: 1150px;
+  max-width: 1400px;
   margin: 0 auto;
   padding-left: 1px; /* matches sidebar */
   padding-top: 1px;   /* matches topbar */
+  background-color: #F0FDF4;
   box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
   color: #111827;

@@ -1,7 +1,8 @@
 import { FileText } from 'lucide-react';
 import DocumentCard from './DocumentCard';
 
-const DocumentList = ({ documents, loading, onDelete }) => {
+const DocumentList = ({ documents = [], loading = false, onDelete }) => {
+  // Loading state
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -11,6 +12,7 @@ const DocumentList = ({ documents, loading, onDelete }) => {
     );
   }
 
+  // Empty state
   if (documents.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-12 text-center border border-green-100">
@@ -20,10 +22,15 @@ const DocumentList = ({ documents, loading, onDelete }) => {
     );
   }
 
+  // List
   return (
     <div className="space-y-4">
       {documents.map((doc) => (
-        <DocumentCard key={doc.docId} document={doc} onDelete={onDelete} />
+        <DocumentCard
+          key={doc.docId}
+          document={doc}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );

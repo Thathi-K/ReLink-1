@@ -1,6 +1,6 @@
 
 .timeline-page {
- max-width: 1150px;
+ max-width: 1400px;
   margin: 0 auto;
   padding-left: 2px;   /* aligns with sidebar */
   padding-top: 8px;      /* tight to topbar */
@@ -22,7 +22,7 @@
 
 .add-event-button {
   padding: 10px 20px;
-  background-color: #10b981;
+  background-color: #F0FDF4;
   color: white;
   border: none;
   border-radius: 8px;
