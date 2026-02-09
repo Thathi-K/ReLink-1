@@ -88,6 +88,10 @@ const MentorsPage = () => {
                   Schedule Session
                 </button>
               </div>
+              <div className="bg-blue-500 text-white p-6">
+                 Tailwind check
+              </div>
+
             </div>
           ))}
         </div>
