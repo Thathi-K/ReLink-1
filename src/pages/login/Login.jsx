@@ -4,7 +4,7 @@ import {
   Shield, ShieldCheck, Users, Sparkles, Zap,
   LogIn, HeartHandshake, CheckCircle, AlertCircle,
   Fingerprint, ArrowLeft, Home, Globe, Key,
-  User, Phone, MapPin, ExternalLink
+  User, Phone, MapPin, ExternalLink, Building, UserCheck
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Login.css";
@@ -21,6 +21,7 @@ function Login() {
     password: "",
   });
   
+  const [userType, setUserType] = useState("applicant"); // "applicant" or "recruiter"
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -37,26 +38,43 @@ function Login() {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showDemoCreds, setShowDemoCreds] = useState(false);
 
+  // Demo credentials for each user type
+  const demoCredentials = {
+    applicant: {
+      email: "applicant@relink.co.za",
+      password: "Demo123!"
+    },
+    recruiter: {
+      email: "recruiter@relink.co.za",
+      password: "Recruiter123!"
+    }
+  };
+
   // Get any registration success message from navigation state
   const registrationMessage = location.state?.message;
   const registeredEmail = location.state?.email;
+  const registeredUserType = location.state?.userType;
 
   // Initialize with demo credentials if in development
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      setFormData({
-        email: "demo@relink.co.za",
-        password: "Demo123!"
-      });
+      setFormData(demoCredentials.applicant);
     }
 
     // Check for saved credentials
     const savedEmail = localStorage.getItem('relink_email');
     const savedRememberMe = localStorage.getItem('relink_remember') === 'true';
+    const savedUserType = localStorage.getItem('relink_userType') || 'applicant';
     
     if (savedEmail && savedRememberMe) {
       setFormData(prev => ({ ...prev, email: savedEmail }));
       setRememberMe(true);
+      setUserType(savedUserType);
+    }
+
+    // Set user type from registration if available
+    if (registeredUserType) {
+      setUserType(registeredUserType);
     }
 
     // Show registration success message if available
@@ -64,7 +82,14 @@ function Login() {
       setSuccessMessage(registrationMessage);
       setTimeout(() => setSuccessMessage(""), 5000);
     }
-  }, [registrationMessage]);
+  }, [registrationMessage, registeredUserType]);
+
+  // Update demo credentials when user type changes
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && showDemoCreds) {
+      setFormData(demoCredentials[userType]);
+    }
+  }, [userType, showDemoCreds]);
 
   // Generate floating animation dots
   useEffect(() => {
@@ -155,6 +180,23 @@ function Login() {
     setPasswordStrength(strength);
   }, [formData.password]);
 
+  // Handle user type change
+  const handleUserTypeChange = (type) => {
+    setUserType(type);
+    
+    // Clear any existing errors
+    setLoginError("");
+    
+    // Add animation effect
+    const buttons = document.querySelectorAll('.user-type-btn');
+    buttons.forEach(btn => {
+      if (btn.dataset.type === type) {
+        btn.classList.add('selected-pulse');
+        setTimeout(() => btn.classList.remove('selected-pulse'), 300);
+      }
+    });
+  };
+
   // Enhanced validation
   const validateForm = useCallback(() => {
     const newErrors = {};
@@ -200,27 +242,34 @@ function Login() {
       if (rememberMe) {
         localStorage.setItem('relink_email', formData.email);
         localStorage.setItem('relink_remember', 'true');
+        localStorage.setItem('relink_userType', userType);
       } else {
         localStorage.removeItem('relink_email');
         localStorage.removeItem('relink_remember');
+        localStorage.removeItem('relink_userType');
       }
       
       // Save a mock token to localStorage (for demo purposes only)
       localStorage.setItem('relink_token', 'demo-token-12345');
       localStorage.setItem('relink_user', JSON.stringify({
         email: formData.email,
-        name: formData.email.split('@')[0]
+        name: formData.email.split('@')[0],
+        type: userType
       }));
       
-      setSuccessMessage('Login successful! Redirecting to your dashboard...');
+      setSuccessMessage(`Login successful! Redirecting to your ${userType === 'recruiter' ? 'recruiter' : 'dashboard'}...`);
       setCardGlow(true);
       
       // Add success animation
       setTimeout(() => setCardGlow(false), 1000);
       
-      // Redirect to Home after 1.5 seconds
+      // Redirect based on user type
       setTimeout(() => {
-        navigate('/dashboard');
+        if (userType === 'recruiter') {
+          navigate('/recruiter');
+        } else {
+          navigate('/dashboard');
+        }
       }, 1500);
       
       setIsLoading(false);
@@ -229,10 +278,7 @@ function Login() {
 
   // Demo login handler
   const handleDemoLogin = useCallback(() => {
-    setFormData({
-      email: "demo@relink.co.za",
-      password: "Demo123!"
-    });
+    setFormData(demoCredentials[userType]);
     
     // Add animation to demo button
     const btn = document.querySelector('.demo-login-btn');
@@ -243,7 +289,7 @@ function Login() {
     
     setShowDemoCreds(true);
     setTimeout(() => setShowDemoCreds(false), 5000);
-  }, []);
+  }, [userType]);
 
   // Forgot password handler
   const handleForgotPassword = () => {
@@ -387,63 +433,128 @@ function Login() {
               </p>
             </div>
             
-            {/* Stats Banner */}
-            <div className="stats-banner">
-              <div className="stat-item">
-                <div className="stat-icon-container">
-                  <CheckCircle size={24} />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">94%</span>
-                  <span className="stat-label">Job Match Success</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon-container">
-                  <Shield size={24} />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">100%</span>
-                  <span className="stat-label">Secure & Verified</span>
-                </div>
+            {/* User Type Selector */}
+            <div className="user-type-selector">
+              <h3 className="selector-title">I am signing in as:</h3>
+              <div className="user-type-buttons">
+                <button
+                  type="button"
+                  className={`user-type-btn ${userType === 'applicant' ? 'selected' : ''}`}
+                  onClick={() => handleUserTypeChange('applicant')}
+                  data-type="applicant"
+                >
+                  <div className="user-type-icon">
+                    <UserCheck size={24} />
+                  </div>
+                  <div className="user-type-content">
+                    <span className="user-type-label">Applicant</span>
+                    <span className="user-type-desc">Formerly Incarcerated Individual</span>
+                  </div>
+                  {userType === 'applicant' && (
+                    <div className="selected-indicator">
+                      <div className="selected-pulse-ring"></div>
+                      <CheckCircle size={16} />
+                    </div>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className={`user-type-btn ${userType === 'recruiter' ? 'selected' : ''}`}
+                  onClick={() => handleUserTypeChange('recruiter')}
+                  data-type="recruiter"
+                >
+                  <div className="user-type-icon">
+                    <Building size={24} />
+                  </div>
+                  <div className="user-type-content">
+                    <span className="user-type-label">Recruiter</span>
+                    <span className="user-type-desc">Employer or Hiring Manager</span>
+                  </div>
+                  {userType === 'recruiter' && (
+                    <div className="selected-indicator">
+                      <div className="selected-pulse-ring"></div>
+                      <CheckCircle size={16} />
+                    </div>
+                  )}
+                </button>
               </div>
             </div>
             
-            {/* Features List */}
+            {/* Features List based on user type */}
             <div className="features-list">
-              <div className="feature-item">
-                <div className="feature-icon">
-                  <div className="icon-circle">
-                    <ShieldCheck size={18} />
+              {userType === 'applicant' ? (
+                <>
+                  <div className="feature-item">
+                    <div className="feature-icon">
+                      <div className="icon-circle">
+                        <ShieldCheck size={18} />
+                      </div>
+                    </div>
+                    <div className="feature-text">
+                      <span className="feature-title">DCS Verified Profiles</span>
+                      <span className="feature-desc">Officer-verified rehabilitation progress</span>
+                    </div>
                   </div>
-                </div>
-                <div className="feature-text">
-                  <span className="feature-title">DCS Verified Profiles</span>
-                  <span className="feature-desc">Officer-verified rehabilitation progress</span>
-                </div>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon">
-                  <div className="icon-circle">
-                    <Users size={18} />
+                  <div className="feature-item">
+                    <div className="feature-icon">
+                      <div className="icon-circle">
+                        <Users size={18} />
+                      </div>
+                    </div>
+                    <div className="feature-text">
+                      <span className="feature-title">Professional Network</span>
+                      <span className="feature-desc">Connect with verified employers</span>
+                    </div>
                   </div>
-                </div>
-                <div className="feature-text">
-                  <span className="feature-title">Professional Network</span>
-                  <span className="feature-desc">Connect with verified employers</span>
-                </div>
-              </div>
-              <div className="feature-item">
-                <div className="feature-icon">
-                  <div className="icon-circle">
-                    <Key size={18} />
+                  <div className="feature-item">
+                    <div className="feature-icon">
+                      <div className="icon-circle">
+                        <Key size={18} />
+                      </div>
+                    </div>
+                    <div className="feature-text">
+                      <span className="feature-title">Secure Access</span>
+                      <span className="feature-desc">Enterprise-grade encryption</span>
+                    </div>
                   </div>
-                </div>
-                <div className="feature-text">
-                  <span className="feature-title">Secure Access</span>
-                  <span className="feature-desc">Enterprise-grade encryption</span>
-                </div>
-              </div>
+                </>
+              ) : (
+                <>
+                  <div className="feature-item">
+                    <div className="feature-icon">
+                      <div className="icon-circle">
+                        <UserCheck size={18} />
+                      </div>
+                    </div>
+                    <div className="feature-text">
+                      <span className="feature-title">Verified Talent Pool</span>
+                      <span className="feature-desc">Access DCS-verified candidates</span>
+                    </div>
+                  </div>
+                  <div className="feature-item">
+                    <div className="feature-icon">
+                      <div className="icon-circle">
+                        <Shield size={18} />
+                      </div>
+                    </div>
+                    <div className="feature-text">
+                      <span className="feature-title">Risk Mitigation</span>
+                      <span className="feature-desc">Comprehensive background verification</span>
+                    </div>
+                  </div>
+                  <div className="feature-item">
+                    <div className="feature-icon">
+                      <div className="icon-circle">
+                        <Users size={18} />
+                      </div>
+                    </div>
+                    <div className="feature-text">
+                      <span className="feature-title">Direct Matching</span>
+                      <span className="feature-desc">Smart candidate-employer matching</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             
             {/* Demo Login Button */}
@@ -455,7 +566,7 @@ function Login() {
               <div className="demo-icon-container">
                 <Zap size={18} />
               </div>
-              <span>Try Demo Account</span>
+              <span>Try {userType === 'recruiter' ? 'Recruiter' : 'Applicant'} Demo</span>
             </button>
             
             {/* Demo Credentials Note */}
@@ -468,6 +579,12 @@ function Login() {
                     <span>Demo Credentials Loaded</span>
                   </div>
                   <div className="demo-info">
+                    <div className="demo-field">
+                      <span className="demo-label">User Type:</span>
+                      <span className={`demo-value ${userType === 'recruiter' ? 'recruiter-value' : 'applicant-value'}`}>
+                        {userType === 'recruiter' ? 'Recruiter' : 'Applicant'}
+                      </span>
+                    </div>
                     <div className="demo-field">
                       <span className="demo-label">Email:</span>
                       <span className="demo-value">{formData.email}</span>
@@ -488,11 +605,17 @@ function Login() {
               <div className="form-header">
                 <h2 className="form-title">
                   <div className="form-icon-container">
-                    <LogIn size={28} />
+                    {userType === 'recruiter' ? <Building size={28} /> : <UserCheck size={28} />}
                   </div>
-                  <span>Welcome Back</span>
+                  <span>
+                    {userType === 'recruiter' ? 'Recruiter Portal' : 'Applicant Dashboard'}
+                  </span>
                 </h2>
-                <p className="form-subtitle">Sign in to access your RE-Link dashboard and continue your journey</p>
+                <p className="form-subtitle">
+                  {userType === 'recruiter' 
+                    ? 'Access verified candidates and recruitment tools' 
+                    : 'Sign in to access your RE-Link dashboard and continue your journey'}
+                </p>
                 
                 {registeredEmail && (
                   <div className="registration-notice">
@@ -689,7 +812,7 @@ function Login() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className={`submit-button ${isLoading ? 'loading' : ''}`}
+                  className={`submit-button ${isLoading ? 'loading' : ''} ${userType}-submit`}
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -697,12 +820,16 @@ function Login() {
                       <div className="spinner">
                         <Loader2 className="spinner-icon" />
                       </div>
-                      <span>Signing In...</span>
+                      <span>
+                        Signing In as {userType === 'recruiter' ? 'Recruiter' : 'Applicant'}...
+                      </span>
                     </>
                   ) : (
                     <>
-                      <LogIn size={20} className="submit-icon" />
-                      <span>Sign In to Your Account</span>
+                      {userType === 'recruiter' ? <Building size={20} /> : <UserCheck size={20} />}
+                      <span>
+                        Sign In as {userType === 'recruiter' ? 'Recruiter' : 'Applicant'}
+                      </span>
                       <ArrowRight size={20} className="submit-arrow" />
                     </>
                   )}
@@ -754,9 +881,11 @@ function Login() {
                 {/* Form Footer */}
                 <div className="form-footer">
                   <p className="signup-prompt">
-                    New to RE-Link?{' '}
+                    {userType === 'recruiter' ? 'Need a recruiter account?' : 'New to RE-Link?'}{' '}
                     <Link to="/register" className="signup-link">
-                      <span className="link-underline">Create your professional profile</span>
+                      <span className="link-underline">
+                        {userType === 'recruiter' ? 'Register as recruiter' : 'Create your professional profile'}
+                      </span>
                       <ArrowRight size={14} className="link-arrow" />
                     </Link>
                   </p>
@@ -829,7 +958,3 @@ function Login() {
 }
 
 export default Login;
-
-
-
-
