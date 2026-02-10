@@ -19,6 +19,7 @@ import VerificationDashboard from "./pages/user/Verification/VerificationDashboa
 //Recruiter dashboard
 
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard.jsx";
+import Home from "./pages/user/Home/Home.jsx";
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* User area */}
-        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/dashboard" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/job-opportunities" element={<JobOpportunities />} />
         <Route path="/referrals" element={<Referrals />} />
