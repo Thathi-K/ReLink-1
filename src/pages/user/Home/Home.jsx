@@ -54,6 +54,7 @@ import {
   Clipboard, ClipboardCopy, ClipboardPaste, ClipboardX
 } from "lucide-react";
 
+import "./Home.css";
 
 // Mock images - Tailored for South Africa
 const ReLinkLogo = "https://via.placeholder.com/100x100/047857/ffffff?text=RE-Link";
@@ -156,7 +157,6 @@ function Home() {
   const messageEndRef = useRef(null);
   const postFileInputRef = useRef(null);
   const profilePicRef = useRef(null);
-  const botRef = useRef(null);
   const logoRef = useRef(null);
 
   // Enhanced user data loading with more details
@@ -223,16 +223,8 @@ function Home() {
       setTitleGlow(prev => !prev);
     }, 1500);
     
-    // Bot spinning animation
-    const botInterval = setInterval(() => {
-      if (botRef.current) {
-        setBotSpinning(prev => !prev);
-      }
-    }, 3000);
-    
     return () => {
       clearInterval(interval);
-      clearInterval(botInterval);
     };
   }, []);
 
@@ -241,7 +233,7 @@ function Home() {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Enhanced Bot responses with South African context
+  // Enhanced Bot responses with South African context (keeping for potential future use)
   const botResponses = {
     greeting: "Molo! I'm RE-Link Assistant. I can help you navigate the platform, find jobs, connect with employers, submit referrals, or answer questions about your reintegration journey in South Africa.",
     jobs: "Looking for jobs in SA? Go to the Networking tab to see available positions matched to your skills. You can filter by location, salary, industry, and availability. Check out our Job Match feature for personalized recommendations!",
@@ -260,56 +252,6 @@ function Home() {
     appointments: "Manage your appointments in the Overview tab. Set reminders for rehab sessions, check-ups, community service, and interviews. Stay organized with your schedule!",
     applications: "Track all your job applications in the Overview tab. See which ones are under review, accepted, or need follow-up with South African employers.",
     default: "I'm here to help! You can ask me about jobs, employers, referrals, posting content, your profile, community events, overview dashboard, or general support in South Africa."
-  };
-
-  const handleBotSubmit = (e) => {
-    e.preventDefault();
-    if (!userInput.trim()) return;
-
-    const input = userInput.toLowerCase();
-    let response = botResponses.default;
-
-    if (input.includes('hello') || input.includes('hi') || input.includes('hey') || input.includes('molo')) {
-      response = botResponses.greeting;
-    } else if (input.includes('job') || input.includes('work') || input.includes('hire') || input.includes('career')) {
-      response = botResponses.jobs;
-    } else if (input.includes('employer') || input.includes('message') || input.includes('chat') || input.includes('contact')) {
-      response = botResponses.employers;
-    } else if (input.includes('profile') || input.includes('skill') || input.includes('experience') || input.includes('resume')) {
-      response = botResponses.profile;
-    } else if (input.includes('community') || input.includes('event') || input.includes('timeline') || input.includes('engage')) {
-      response = botResponses.community;
-    } else if (input.includes('referral') || input.includes('document') || input.includes('credibility') || input.includes('verify')) {
-      response = botResponses.referrals;
-    } else if (input.includes('post') || input.includes('share') || input.includes('content') || input.includes('social')) {
-      response = botResponses.posting;
-    } else if (input.includes('help') || input.includes('support') || input.includes('contact') || input.includes('emergency')) {
-      response = botResponses.support;
-    } else if (input.includes('overview') || input.includes('dashboard') || input.includes('stat') || input.includes('progress')) {
-      response = botResponses.overview;
-    } else if (input.includes('network') || input.includes('connect') || input.includes('opportunity')) {
-      response = botResponses.networking;
-    } else if (input.includes('credibility') || input.includes('score') || input.includes('reputation')) {
-      response = botResponses.credibility;
-    } else if (input.includes('document') || input.includes('upload') || input.includes('certificate')) {
-      response = botResponses.documents;
-    } else if (input.includes('timeline') || input.includes('journey') || input.includes('history')) {
-      response = botResponses.timeline;
-    } else if (input.includes('privacy') || input.includes('secure') || input.includes('private') || input.includes('hide')) {
-      response = botResponses.privacy;
-    } else if (input.includes('appointment') || input.includes('meeting') || input.includes('schedule')) {
-      response = botResponses.appointments;
-    } else if (input.includes('application') || input.includes('apply') || input.includes('submitted')) {
-      response = botResponses.applications;
-    }
-
-    // Add typing animation effect
-    setIsLoading(true);
-    setTimeout(() => {
-      setBotMessage(response);
-      setUserInput("");
-      setIsLoading(false);
-    }, 500);
   };
 
   // Enhanced image selection with preview
@@ -1172,13 +1114,6 @@ function Home() {
     learnership: filteredJobs.filter(job => job.category === "learnership"),
     volunteer: filteredJobs.filter(job => job.category === "volunteer"),
     internship: filteredJobs.filter(job => job.category === "internship")
-  };
-
-  // Handle bot activation with spinning animation
-  const handleBotActivation = () => {
-    setBotSpinning(true);
-    setShowBot(true);
-    setTimeout(() => setBotSpinning(false), 1000);
   };
 
   // Handle logo animation
@@ -3094,122 +3029,6 @@ function Home() {
           </div>
         </footer>
       </div>
-
-      {/* Enhanced Spinning Bot Assistant */}
-      <div 
-        className={`bot-assistant ${botSpinning ? 'spinning' : ''}`} 
-        onClick={handleBotActivation}
-        ref={botRef}
-      >
-        <div className="bot-logo-container">
-          <div className="bot-logo-glow"></div>
-          <div className="bot-spinner-ring"></div>
-          <img 
-            src={ReLinkLogo} 
-            alt="RE-Link Assistant" 
-            className="bot-logo-image"
-          />
-          <div className="bot-indicator">
-            <div className="pulse-ring"></div>
-            <div className="pulse-ring ring2"></div>
-            <div className="pulse-ring ring3"></div>
-            <Bot size={20} />
-          </div>
-        </div>
-        <div className="bot-tooltip">
-          <Sparkles size={12} />
-          <span>Need help? Ask me anything!</span>
-        </div>
-      </div>
-
-      {/* Enhanced Bot Assistant Modal */}
-      {showBot && (
-        <div className="bot-modal">
-          <div className="bot-modal-overlay" onClick={() => setShowBot(false)}></div>
-          <div className="bot-modal-content">
-            <div className="bot-modal-header">
-              <div className="bot-modal-title">
-                <div className="bot-avatar">
-                  <img src={ReLinkLogo} alt="RE-Link Bot" />
-                  <div className="bot-status-indicator">
-                    <div className="status-dot online"></div>
-                  </div>
-                </div>
-                <div className="bot-info">
-                  <h3>RE-Link Assistant</h3>
-                  <div className="bot-status">
-                    <span>AI Assistant • Ready to help in South Africa</span>
-                  </div>
-                </div>
-              </div>
-              <button className="close-bot-btn" onClick={() => setShowBot(false)}>
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="bot-conversation">
-              <div className="bot-message">
-                <div className="message-avatar">
-                  <Bot size={20} />
-                </div>
-                <div className="message-bubble">
-                  <p className="message-text">
-                    {botMessage || botResponses.greeting}
-                  </p>
-                  <span className="message-time">Just now</span>
-                </div>
-              </div>
-              
-              <div className="suggested-questions">
-                <p className="suggested-title">Quick questions you can ask:</p>
-                <div className="suggested-buttons">
-                  <button className="suggested-btn" onClick={() => {
-                    setUserInput("How do I find jobs in SA?");
-                    setTimeout(() => setBotMessage(botResponses.jobs), 500);
-                  }}>
-                    💼 Find jobs
-                  </button>
-                  <button className="suggested-btn" onClick={() => {
-                    setUserInput("How to submit referrals?");
-                    setTimeout(() => setBotMessage(botResponses.referrals), 500);
-                  }}>
-                    📄 Submit referrals
-                  </button>
-                  <button className="suggested-btn" onClick={() => {
-                    setUserInput("Update my profile");
-                    setTimeout(() => setBotMessage(botResponses.profile), 500);
-                  }}>
-                    👤 Update profile
-                  </button>
-                  <button className="suggested-btn" onClick={() => {
-                    setUserInput("Need support in South Africa");
-                    setTimeout(() => setBotMessage(botResponses.support), 500);
-                  }}>
-                    🆘 Get support
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <form onSubmit={handleBotSubmit} className="bot-input-form">
-              <div className="input-container">
-                <input
-                  type="text"
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="Ask me anything about RE-Link in South Africa..."
-                  className="bot-input"
-                  disabled={isLoading}
-                />
-                <button type="submit" className="send-bot-btn" disabled={isLoading}>
-                  {isLoading ? <Loader2 size={20} className="spinner" /> : <Send size={20} />}
-                </button>
-              </div>
-              <p className="bot-hint">Press Enter to send • Type 'help' for more options</p>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
