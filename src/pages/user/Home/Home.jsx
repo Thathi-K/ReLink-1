@@ -55,13 +55,13 @@ import {
 } from "lucide-react";
 
 import "./Home.css";
+import ReLinkLogo from "../../../assets/RelinkLOGO.jpeg";
+import BuildRightLogo from "../../../assets/buildright_thumb.jpg";
+import LogisticsSALogo from "../../../assets/logistics_thumb.jpg";
+import CallComLogo from "../../../assets/callcom_thumb.jpg";
+import ConstructionCoLogo from "../../../assets/constructionco_thumb.jpg";
 
 // Mock images - Tailored for South Africa
-const ReLinkLogo = "https://via.placeholder.com/100x100/047857/ffffff?text=RE-Link";
-const BuildRightLogo = "https://via.placeholder.com/100x100/10b981/ffffff?text=BuildRight";
-const LogisticsSALogo = "https://via.placeholder.com/100x100/059669/ffffff?text=LogisticsSA";
-const CallComLogo = "https://via.placeholder.com/100x100/3b82f6/ffffff?text=CallCom";
-const ConstructionCoLogo = "https://via.placeholder.com/100x100/f59e0b/000000?text=Construction";
 const WareHouseProLogo = "https://via.placeholder.com/100x100/8b5cf6/ffffff?text=WarehousePro";
 
 // South African specific user journeys
@@ -85,17 +85,7 @@ function Home() {
     dob: "1990-01-01",
     location: "Soweto, Johannesburg"
   });
-  const [notifications, setNotifications] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showBot, setShowBot] = useState(false);
-  const [botMessage, setBotMessage] = useState("");
-  const [userInput, setUserInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [floatingDots, setFloatingDots] = useState([]);
-  const [logoHover, setLogoHover] = useState(false);
-  const [logoLoaded, setLogoLoaded] = useState(true);
-  const [titleGlow, setTitleGlow] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [newPost, setNewPost] = useState("");
   const [posts, setPosts] = useState([]);
   const [credibilityScore, setCredibilityScore] = useState(78);
@@ -116,9 +106,7 @@ function Home() {
   ]);
   const [referralType, setReferralType] = useState("employer");
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [newMessageNotification, setNewMessageNotification] = useState(true);
   const [showJobCategory, setShowJobCategory] = useState("All");
-  const [botSpinning, setBotSpinning] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [appointments, setAppointments] = useState([
     { id: 1, type: "rehab", title: "Rehabilitation Session", date: "2024-02-15", time: "10:00 AM", location: "Soweto Hope Center", status: "upcoming" },
@@ -159,7 +147,7 @@ function Home() {
   const profilePicRef = useRef(null);
   const logoRef = useRef(null);
 
-  // Enhanced user data loading with more details
+  // Load data on component mount
   useEffect(() => {
     // Load user data from localStorage or use mock data
     const savedUser = localStorage.getItem('relink_user');
@@ -203,56 +191,27 @@ function Home() {
       setJobsApplied(JSON.parse(savedJobsApplied));
     }
 
-    // Generate enhanced floating dots
-    const dots = [];
-    for (let i = 0; i < 25; i++) {
-      dots.push({
-        id: i,
-        size: Math.random() * 8 + 2,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        duration: Math.random() * 20 + 10,
-        delay: Math.random() * 5,
-        color: i % 3 === 0 ? "#10b981" : i % 3 === 1 ? "#047857" : "#065f46"
-      });
+    // Initialize posts
+    const savedPosts = localStorage.getItem('relink_posts');
+    if (savedPosts) {
+      setPosts(JSON.parse(savedPosts));
+    } else {
+      setPosts(motivationalPosts);
+      localStorage.setItem('relink_posts', JSON.stringify(motivationalPosts));
     }
-    setFloatingDots(dots);
-
-    // Enhanced title glow animation
-    const interval = setInterval(() => {
-      setTitleGlow(prev => !prev);
-    }, 1500);
     
-    return () => {
-      clearInterval(interval);
-    };
+    // Load documents from localStorage
+    const savedDocuments = localStorage.getItem('relink_documents');
+    if (savedDocuments) {
+      setReferralDocuments(JSON.parse(savedDocuments));
+    }
+    
+    // Initialize selected conversation
+    if (conversations.length > 0 && !selectedConversation) {
+      setSelectedConversation(conversations[0]);
+      setMessages(conversations[0].messages);
+    }
   }, []);
-
-  // Scroll to bottom of messages
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Enhanced Bot responses with South African context (keeping for potential future use)
-  const botResponses = {
-    greeting: "Molo! I'm RE-Link Assistant. I can help you navigate the platform, find jobs, connect with employers, submit referrals, or answer questions about your reintegration journey in South Africa.",
-    jobs: "Looking for jobs in SA? Go to the Networking tab to see available positions matched to your skills. You can filter by location, salary, industry, and availability. Check out our Job Match feature for personalized recommendations!",
-    employers: "To message verified employers, click on the Messages tab. Only verified employers can message here for your security. You'll see a green checkmark next to their names. Remember to check your credibility score before applying!",
-    profile: "Update your professional profile in the Profile tab to get better job matches. Add your skills, education, certificates, and work experience. A complete profile increases your credibility score by 25%!",
-    community: "Check the Community tab to submit referral documents, track your rehabilitation timeline, and build your credibility score through positive community engagement. Attend events to network with fellow South Africans!",
-    referrals: "You can submit referral documents from employers, rehabilitation centers, police officers, or community leaders. Each document adds to your credibility score. Verified documents earn more points!",
-    posting: "In the Home tab, you can share your journey, post opportunities, motivational quotes, or positive content. Choose the post type that fits your content. Remember, positivity attracts opportunities!",
-    support: "Need help? You can contact our support team at support@relink.co.za or call 0800-RE-LINK (735-465). We're here to help you succeed. Emergency support is available 24/7 across South Africa.",
-    overview: "The Overview tab gives you a complete dashboard of your progress. Check your credibility score, upcoming appointments, jobs applied, and quick statistics about your journey.",
-    networking: "Networking tab shows available jobs, learnerships, volunteer work, and internships. Use filters to find the perfect opportunity in your province. Don't forget to check networking tips at the bottom!",
-    credibility: "Your credibility score is calculated based on referrals, employment history, community engagement, and document verification. Higher scores attract better opportunities with South African employers!",
-    documents: "You can upload documents in the Community tab. Each verified document boosts your score. Keep your documents updated for maximum credibility impact.",
-    timeline: "Track your rehabilitation journey in the Community tab. Add milestones from pre-arrest to present day. This helps employers understand your growth journey.",
-    privacy: "In Profile settings, you can choose what information to share. Sensitive data can be hidden and only shown to verified recruiters when you grant permission.",
-    appointments: "Manage your appointments in the Overview tab. Set reminders for rehab sessions, check-ups, community service, and interviews. Stay organized with your schedule!",
-    applications: "Track all your job applications in the Overview tab. See which ones are under review, accepted, or need follow-up with South African employers.",
-    default: "I'm here to help! You can ask me about jobs, employers, referrals, posting content, your profile, community events, overview dashboard, or general support in South Africa."
-  };
 
   // Enhanced image selection with preview
   const handleImageSelect = (e) => {
@@ -340,9 +299,6 @@ function Home() {
     if (postFileInputRef.current) {
       postFileInputRef.current.value = "";
     }
-    
-    // Add notification for successful post
-    setNotifications(prev => prev + 1);
     
     // Save to localStorage
     localStorage.setItem('relink_posts', JSON.stringify([newPostObj, ...posts]));
@@ -1055,30 +1011,6 @@ function Home() {
     { id: "internship", label: "Internships", icon: BookOpen }
   ];
 
-  // Initialize posts with sample data
-  useEffect(() => {
-    // Load posts from localStorage or use mock data
-    const savedPosts = localStorage.getItem('relink_posts');
-    if (savedPosts) {
-      setPosts(JSON.parse(savedPosts));
-    } else {
-      setPosts(motivationalPosts);
-      localStorage.setItem('relink_posts', JSON.stringify(motivationalPosts));
-    }
-    
-    // Load documents from localStorage
-    const savedDocuments = localStorage.getItem('relink_documents');
-    if (savedDocuments) {
-      setReferralDocuments(JSON.parse(savedDocuments));
-    }
-    
-    // Initialize selected conversation
-    if (conversations.length > 0 && !selectedConversation) {
-      setSelectedConversation(conversations[0]);
-      setMessages(conversations[0].messages);
-    }
-  }, []);
-
   // Enhanced post type options based on user type
   const postTypeOptions = user?.userType === "ex-convict" ? [
     { value: "journey", label: "My Journey", icon: "🚶" },
@@ -1130,64 +1062,30 @@ function Home() {
 
   return (
     <div className={`home-page ${darkMode ? 'dark-mode' : ''}`}>
-      {/* Enhanced Background Elements */}
-      <div className="background-gradient"></div>
-      
-      <div className="floating-dots-container">
-        {floatingDots.map(dot => (
-          <div
-            key={dot.id}
-            className="floating-dot"
-            style={{
-              width: dot.size,
-              height: dot.size,
-              left: `${dot.x}%`,
-              top: `${dot.y}%`,
-              animationDuration: `${dot.duration}s`,
-              animationDelay: `${dot.delay}s`,
-              backgroundColor: dot.color
-            }}
-          ></div>
-        ))}
-      </div>
-
-      {/* Enhanced Left Side Navigation */}
+      {/* Simplified Layout */}
       <div className="side-navigation">
         <div className="nav-container">
-          {/* Enhanced Logo Section with Animation */}
+          {/* Logo Section */}
           <div 
             className="logo-section"
             onClick={() => {
               setActiveTab('overview');
               handleLogoAnimation();
             }}
-            onMouseEnter={() => setLogoHover(true)}
-            onMouseLeave={() => setLogoHover(false)}
           >
-            <div className={`logo-glow ${logoHover ? 'active' : ''}`}></div>
-            <div className="logo-pulse"></div>
-            <div className="logo-orbital">
-              <div className="orbital-ring"></div>
-              <div className="orbital-ring ring-2"></div>
-            </div>
             <img 
               ref={logoRef}
               src={ReLinkLogo} 
               alt="RE-Link Logo" 
-              className={`logo-image ${logoHover ? 'hover' : ''} ${logoLoaded ? 'loaded' : ''}`}
-              onLoad={() => setLogoLoaded(true)}
+              className="logo-image"
             />
             <div className="logo-text">
               <h1 className="logo-title">RE-LINK</h1>
               <p className="logo-slogan">Second Chances, Real Connections</p>
-              <div className="logo-badge">
-                <ShieldCheck size={12} />
-                <span>DCS Verified</span>
-              </div>
             </div>
           </div>
 
-          {/* Enhanced Navigation Items */}
+          {/* Navigation Items */}
           <div className="nav-items">
             <button 
               className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}
@@ -1197,7 +1095,6 @@ function Home() {
                 <BarChart3 size={22} />
               </div>
               <span className="nav-label">Overview</span>
-              {activeTab === 'overview' && <div className="nav-indicator"></div>}
             </button>
             
             <button 
@@ -1208,7 +1105,6 @@ function Home() {
                 <HomeIcon size={22} />
               </div>
               <span className="nav-label">Home</span>
-              {activeTab === 'home' && <div className="nav-indicator"></div>}
             </button>
             
             <button 
@@ -1217,10 +1113,8 @@ function Home() {
             >
               <div className="nav-icon">
                 <Briefcase size={22} />
-                <span className="nav-badge">{featuredJobs.length}</span>
               </div>
               <span className="nav-label">Networking</span>
-              {activeTab === 'networking' && <div className="nav-indicator"></div>}
             </button>
             
             <button 
@@ -1231,22 +1125,16 @@ function Home() {
                 <Users size={22} />
               </div>
               <span className="nav-label">Community</span>
-              {activeTab === 'community' && <div className="nav-indicator"></div>}
             </button>
             
             <button 
               className={`nav-item ${activeTab === 'messages' ? 'active' : ''}`}
-              onClick={() => {
-                setActiveTab('messages');
-                setNewMessageNotification(false);
-              }}
+              onClick={() => setActiveTab('messages')}
             >
               <div className="nav-icon">
                 <MessageCircle size={22} />
-                {newMessageNotification && <span className="nav-badge">3</span>}
               </div>
               <span className="nav-label">Messages</span>
-              {activeTab === 'messages' && <div className="nav-indicator"></div>}
             </button>
             
             <button 
@@ -1257,11 +1145,10 @@ function Home() {
                 <User size={22} />
               </div>
               <span className="nav-label">Profile</span>
-              {activeTab === 'profile' && <div className="nav-indicator"></div>}
             </button>
           </div>
 
-          {/* Enhanced User Profile Summary */}
+          {/* User Profile Summary */}
           <div className="user-summary">
             <div className="profile-avatar" onClick={() => profilePicRef.current?.click()}>
               {profilePicture ? (
@@ -1301,9 +1188,9 @@ function Home() {
         </div>
       </div>
 
-      {/* Enhanced Main Content Area */}
+      {/* Main Content Area */}
       <div className="main-content">
-        {/* Enhanced Top Header */}
+        {/* Top Header */}
         <header className="top-header">
           <div className="search-section">
             <div className="search-container">
@@ -1322,40 +1209,19 @@ function Home() {
               )}
             </div>
           </div>
-
-          <div className="header-actions">
-            <button className="notification-btn">
-              <Bell size={22} />
-              {notifications > 0 && (
-                <span className="notification-badge">{notifications}</span>
-              )}
-            </button>
-
-            <button 
-              className="mobile-menu-btn" 
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-            >
-              {showMobileMenu ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
         </header>
 
-        {/* Enhanced Main Content */}
+        {/* Main Content */}
         <main className="content-area">
-          {/* Enhanced Welcome Banner */}
-          <div className={`welcome-banner ${titleGlow ? 'glow' : ''}`}>
+          {/* Welcome Banner */}
+          <div className="welcome-banner">
             <div className="welcome-content">
               <div className="welcome-text">
-                <div className="welcome-badge">
-                  <Sparkles size={20} />
-                  <span>Welcome back, {user?.name || "Champion"}!</span>
-                </div>
                 <h2 className="welcome-title">
-                  Your Journey to Success Continues
-                  <span className="title-highlight"> Today</span>
+                  Welcome back, {user?.name || "Champion"}!
                 </h2>
                 <p className="welcome-subtitle">
-                  Connect with opportunities, build credibility, and thrive with South African professionals who believe in second chances.
+                  Your journey to success continues today
                 </p>
               </div>
               <div className="welcome-stats">
@@ -1386,23 +1252,14 @@ function Home() {
                     <span className="stat-label">Applications</span>
                   </div>
                 </div>
-                <div className="stat-item">
-                  <div className="stat-icon">
-                    <Calendar size={20} />
-                  </div>
-                  <div className="stat-details">
-                    <span className="stat-number">{appointments.length}</span>
-                    <span className="stat-label">Appointments</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Enhanced Tab Content Container */}
+          {/* Tab Content Container */}
           <div className="tab-content-container">
             
-            {/* OVERVIEW TAB - Enhanced Dashboard */}
+            {/* OVERVIEW TAB */}
             {activeTab === 'overview' && (
               <div className="overview-tab">
                 <div className="overview-header">
@@ -1410,7 +1267,6 @@ function Home() {
                     <BarChart3 size={28} />
                     <span>Your Dashboard</span>
                   </h3>
-                  <p className="section-subtitle">Track your progress, appointments, and opportunities all in one place</p>
                 </div>
 
                 {/* Quick Stats Grid */}
@@ -1423,10 +1279,6 @@ function Home() {
                       <span className="quick-stat-number">{quickStats.dailyViews}</span>
                       <span className="quick-stat-label">Daily Profile Views</span>
                     </div>
-                    <div className="quick-stat-trend">
-                      <TrendingUp size={16} />
-                      <span>+12%</span>
-                    </div>
                   </div>
                   
                   <div className="quick-stat-card">
@@ -1436,10 +1288,6 @@ function Home() {
                     <div className="quick-stat-content">
                       <span className="quick-stat-number">{quickStats.weeklyConnections}</span>
                       <span className="quick-stat-label">Weekly Connections</span>
-                    </div>
-                    <div className="quick-stat-trend">
-                      <TrendingUp size={16} />
-                      <span>+8%</span>
                     </div>
                   </div>
                   
@@ -1451,10 +1299,6 @@ function Home() {
                       <span className="quick-stat-number">{quickStats.monthlyApplications}</span>
                       <span className="quick-stat-label">Monthly Applications</span>
                     </div>
-                    <div className="quick-stat-trend">
-                      <TrendingUp size={16} />
-                      <span>+15%</span>
-                    </div>
                   </div>
                   
                   <div className="quick-stat-card">
@@ -1464,10 +1308,6 @@ function Home() {
                     <div className="quick-stat-content">
                       <span className="quick-stat-number">{quickStats.totalReferrals}</span>
                       <span className="quick-stat-label">Total Referrals</span>
-                    </div>
-                    <div className="quick-stat-trend">
-                      <TrendingUp size={16} />
-                      <span>+5%</span>
                     </div>
                   </div>
                 </div>
@@ -1481,9 +1321,6 @@ function Home() {
                         <Target size={20} />
                         <span>Credibility Score</span>
                       </h4>
-                      <button className="card-action">
-                        <RefreshCw size={16} />
-                      </button>
                     </div>
                     <div className="credibility-display">
                       <div className="score-circle-large">
@@ -1517,9 +1354,6 @@ function Home() {
                         <Calendar size={20} />
                         <span>Upcoming Appointments</span>
                       </h4>
-                      <button className="card-action">
-                        <Plus size={16} />
-                      </button>
                     </div>
                     <div className="appointments-list">
                       {appointments.slice(0, 3).map(appointment => (
@@ -1541,17 +1375,6 @@ function Home() {
                             <span className="appointment-date">{appointment.date}</span>
                             <span className="appointment-time">{appointment.time}</span>
                           </div>
-                          <div className="appointment-actions">
-                            <button 
-                              className="status-btn"
-                              onClick={() => handleAppointmentStatus(appointment.id, 'completed')}
-                            >
-                              <CheckCircle size={14} />
-                            </button>
-                            <button className="more-btn">
-                              <MoreVertical size={14} />
-                            </button>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -1564,7 +1387,6 @@ function Home() {
                         <Briefcase size={20} />
                         <span>Jobs Applied</span>
                       </h4>
-                      <span className="card-badge">{jobsApplied.length}</span>
                     </div>
                     <div className="applications-list">
                       {jobsApplied.slice(0, 4).map(job => (
@@ -1583,122 +1405,21 @@ function Home() {
                       ))}
                     </div>
                   </div>
-
-                  {/* User Progress */}
-                  <div className="dashboard-card">
-                    <div className="card-header">
-                      <h4 className="card-title">
-                        <Activity size={20} />
-                        <span>Your Progress</span>
-                      </h4>
-                      <span className="card-badge">85%</span>
-                    </div>
-                    <div className="progress-metrics">
-                      {Object.entries(userProgress).map(([key, value]) => (
-                        <div key={key} className="progress-item">
-                          <div className="progress-label">
-                            <span className="progress-name">
-                              {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                            </span>
-                            <span className="progress-value">{value}%</span>
-                          </div>
-                          <div className="progress-bar">
-                            <div 
-                              className="progress-fill"
-                              style={{ width: `${value}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Recent Activity */}
-                <div className="recent-activity">
-                  <div className="activity-header">
-                    <h4 className="activity-title">Recent Activity</h4>
-                    <button className="view-all-btn">View All</button>
-                  </div>
-                  <div className="activity-list">
-                    <div className="activity-item">
-                      <div className="activity-icon success">
-                        <CheckCircle size={16} />
-                      </div>
-                      <div className="activity-content">
-                        <span className="activity-text">Applied for Construction Supervisor at BuildRight</span>
-                        <span className="activity-time">2 hours ago</span>
-                      </div>
-                    </div>
-                    <div className="activity-item">
-                      <div className="activity-icon info">
-                        <FileText size={16} />
-                      </div>
-                      <div className="activity-content">
-                        <span className="activity-text">Uploaded Police Clearance Certificate</span>
-                        <span className="activity-time">1 day ago</span>
-                      </div>
-                    </div>
-                    <div className="activity-item">
-                      <div className="activity-icon warning">
-                        <Calendar size={16} />
-                      </div>
-                      <div className="activity-content">
-                        <span className="activity-text">Scheduled Rehabilitation Session</span>
-                        <span className="activity-time">2 days ago</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
 
-            {/* HOME TAB - Enhanced Community Feed */}
+            {/* HOME TAB */}
             {activeTab === 'home' && (
               <div className="home-tab">
                 <div className="feed-header">
                   <h3 className="feed-title">
                     <Users size={24} />
                     Community Feed
-                    <span className="feed-badge">{posts.length} posts</span>
                   </h3>
-                  <div className="feed-actions">
-                    <div className="post-type-selector">
-                      <select 
-                        className="post-type-select"
-                        value={postType}
-                        onChange={(e) => setPostType(e.target.value)}
-                      >
-                        {postTypeOptions.map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.icon} {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="media-buttons">
-                      <button 
-                        className="upload-media-btn"
-                        onClick={() => postFileInputRef.current?.click()}
-                      >
-                        <Image size={20} />
-                        <span>Add Media</span>
-                      </button>
-                      <input
-                        type="file"
-                        ref={postFileInputRef}
-                        accept="image/*"
-                        onChange={handleImageSelect}
-                        style={{ display: 'none' }}
-                      />
-                      <button className="upload-video-btn">
-                        <Video size={20} />
-                      </button>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Enhanced Create Post */}
+                {/* Create Post */}
                 <div className="create-post-card">
                   <div className="post-user-info">
                     <div className="user-avatar">
@@ -1710,15 +1431,12 @@ function Home() {
                     </div>
                     <div className="user-details">
                       <h4 className="user-name">{user?.name || "You"}</h4>
-                      <span className="user-type">
-                        {user?.userType ? user.userType.replace('-', ' ').toUpperCase() : "MEMBER"}
-                      </span>
                     </div>
                   </div>
                   
                   <div className="post-content-area">
                     <textarea
-                      placeholder={`Share your ${postTypeOptions.find(opt => opt.value === postType)?.label?.toLowerCase() || 'thoughts'}... (Max 1000 characters)`}
+                      placeholder={`Share your thoughts... (Max 1000 characters)`}
                       value={newPost}
                       onChange={(e) => {
                         if (e.target.value.length <= 1000) {
@@ -1726,32 +1444,11 @@ function Home() {
                         }
                       }}
                       className="post-input"
-                      rows={4}
+                      rows={3}
                       maxLength={1000}
                     />
-                    <div className="char-count">
-                      {newPost.length}/1000 characters
-                    </div>
-                    
-                    {selectedImage && (
-                      <div className="selected-image-preview">
-                        <img src={selectedImage} alt="Selected" className="preview-image" />
-                        <button 
-                          className="remove-image-btn"
-                          onClick={() => setSelectedImage(null)}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    )}
                     
                     <div className="post-actions">
-                      <div className="post-type-indicator">
-                        <span className="type-badge">
-                          {postTypeOptions.find(opt => opt.value === postType)?.icon || "📝"} 
-                          {postTypeOptions.find(opt => opt.value === postType)?.label || postType.toUpperCase()}
-                        </span>
-                      </div>
                       <button 
                         className="post-submit-btn"
                         onClick={handleNewPost}
@@ -1764,7 +1461,7 @@ function Home() {
                   </div>
                 </div>
 
-                {/* Enhanced Posts Feed */}
+                {/* Posts Feed */}
                 <div className="posts-feed">
                   {posts.map(post => (
                     <div key={post.id} className="post-card">
@@ -1772,18 +1469,10 @@ function Home() {
                         <div className="post-user">
                           <div className="post-avatar">
                             <span className="post-avatar-icon">{post.icon}</span>
-                            {post.verified && (
-                              <div className="verified-badge">
-                                <ShieldCheck size={12} />
-                              </div>
-                            )}
                           </div>
                           <div className="post-user-info">
                             <h4 className="post-username">{post.user}</h4>
-                            <div className="post-user-details">
-                              <span className="post-user-role">{post.role}</span>
-                              <span className="post-type-tag">{post.postType}</span>
-                            </div>
+                            <span className="post-user-role">{post.role}</span>
                           </div>
                         </div>
                         <div className="post-timestamp">
@@ -1801,108 +1490,18 @@ function Home() {
                         )}
                       </div>
                       
-                      <div className="post-stats">
-                        <div className="post-stat">
-                          <Heart size={16} />
-                          <span>{post.likes} likes</span>
-                        </div>
-                        <div className="post-stat">
-                          <MessageSquare size={16} />
-                          <span>{post.comments.length} comments</span>
-                        </div>
-                        <div className="post-stat">
-                          <Share2 size={16} />
-                          <span>{post.shares} shares</span>
-                        </div>
-                      </div>
-                      
                       <div className="post-actions">
                         <button 
                           className="post-action-btn"
                           onClick={() => handleLikePost(post.id)}
                         >
                           <ThumbsUp size={18} />
-                          <span>Like</span>
+                          <span>Like ({post.likes})</span>
                         </button>
                         <button className="post-action-btn">
                           <MessageSquare size={18} />
-                          <span>Comment</span>
+                          <span>Comment ({post.comments.length})</span>
                         </button>
-                        <button className="post-action-btn">
-                          <Share2 size={18} />
-                          <span>Share</span>
-                        </button>
-                        <button className="post-action-btn">
-                          <Bookmark size={18} />
-                        </button>
-                      </div>
-                      
-                      {/* Enhanced Comments Section */}
-                      <div className="post-comments">
-                        <div className="comments-header">
-                          <span className="comments-title">Comments ({post.comments.length})</span>
-                          {post.allowComments ? (
-                            <span className="comments-note">Only employers & organizations can comment</span>
-                          ) : (
-                            <span className="comments-note">Comments disabled</span>
-                          )}
-                        </div>
-                        
-                        {post.comments.map(comment => (
-                          <div key={comment.id} className="comment-item">
-                            <div className="comment-avatar">
-                              <span className="avatar-initial-small">{comment.user.charAt(0)}</span>
-                              {comment.verified && (
-                                <div className="comment-verified">
-                                  <ShieldCheck size={10} />
-                                </div>
-                              )}
-                            </div>
-                            <div className="comment-content">
-                              <div className="comment-header">
-                                <span className="comment-user">{comment.user}</span>
-                                {comment.userType && (
-                                  <span className="comment-user-type">{comment.userType.toUpperCase()}</span>
-                                )}
-                                <span className="comment-time">{comment.timestamp}</span>
-                              </div>
-                              <p className="comment-text">{comment.content}</p>
-                            </div>
-                          </div>
-                        ))}
-                        
-                        {post.allowComments && (
-                          <div className="add-comment-section">
-                            <div className="comment-avatar-small">
-                              <span className="avatar-initial-small">{user?.name?.charAt(0) || "U"}</span>
-                            </div>
-                            <div className="comment-input-container">
-                              <input
-                                type="text"
-                                placeholder="Add a comment as an employer or organization..."
-                                className="comment-input"
-                                onKeyPress={(e) => {
-                                  if (e.key === 'Enter' && e.target.value.trim()) {
-                                    handleAddComment(post.id, e.target.value);
-                                    e.target.value = '';
-                                  }
-                                }}
-                              />
-                              <button 
-                                className="comment-submit-btn"
-                                onClick={(e) => {
-                                  const input = e.target.closest('.comment-input-container').querySelector('.comment-input');
-                                  if (input.value.trim()) {
-                                    handleAddComment(post.id, input.value);
-                                    input.value = '';
-                                  }
-                                }}
-                              >
-                                <SendHorizontal size={16} />
-                              </button>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -1910,7 +1509,7 @@ function Home() {
               </div>
             )}
 
-            {/* NETWORKING TAB - Enhanced Job Search */}
+            {/* NETWORKING TAB */}
             {activeTab === 'networking' && (
               <div className="networking-tab">
                 <div className="networking-header">
@@ -1918,10 +1517,9 @@ function Home() {
                     <BriefcaseBusiness size={28} />
                     <span>Find Your Next Opportunity</span>
                   </h3>
-                  <p className="section-subtitle">Jobs tailored to your skills and experience in South Africa</p>
                 </div>
 
-                {/* Enhanced Filters Section */}
+                {/* Filters Section */}
                 <div className="filters-section">
                   <div className="filters-grid">
                     <div className="filter-group">
@@ -1958,38 +1556,6 @@ function Home() {
                     
                     <div className="filter-group">
                       <label className="filter-label">
-                        <span className="salary-icon">R</span>
-                        Salary Range
-                      </label>
-                      <select 
-                        className="filter-select"
-                        value={salaryRange}
-                        onChange={(e) => setSalaryRange(e.target.value)}
-                      >
-                        {salaryRanges.map(range => (
-                          <option key={range} value={range}>{range}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div className="filter-group">
-                      <label className="filter-label">
-                        <Calendar size={16} />
-                        Availability
-                      </label>
-                      <select 
-                        className="filter-select"
-                        value={availability}
-                        onChange={(e) => setAvailability(e.target.value)}
-                      >
-                        {availabilityOptions.map(option => (
-                          <option key={option} value={option}>{option}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div className="filter-group">
-                      <label className="filter-label">
                         <Briefcase size={16} />
                         Job Type
                       </label>
@@ -2003,88 +1569,33 @@ function Home() {
                         ))}
                       </select>
                     </div>
-                    
-                    <div className="filter-group">
-                      <label className="filter-label">&nbsp;</label>
-                      <button 
-                        className="reset-filters-btn"
-                        onClick={() => {
-                          setSelectedIndustry("All Industries");
-                          setSelectedLocation("All Locations");
-                          setSalaryRange("All Ranges");
-                          setAvailability("All");
-                          setJobType("All Types");
-                          setShowJobCategory("All");
-                        }}
-                      >
-                        <X size={16} />
-                        <span>Reset All</span>
-                      </button>
-                    </div>
                   </div>
                 </div>
 
-                {/* Job Categories Tabs */}
-                <div className="category-tabs">
-                  {jobCategories.map(category => (
-                    <button
-                      key={category.id}
-                      className={`category-tab ${showJobCategory === category.id ? 'active' : ''}`}
-                      onClick={() => setShowJobCategory(category.id)}
-                    >
-                      <category.icon size={18} />
-                      <span>{category.label}</span>
-                      <span className="category-count">
-                        {category.id === 'All' ? filteredJobs.length : jobsByCategory[category.id]?.length || 0}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Enhanced Jobs Grid */}
+                {/* Jobs Grid */}
                 <div className="jobs-section">
                   <div className="jobs-header">
                     <h4 className="jobs-title">
-                      {showJobCategory === 'All' ? 'All Opportunities' : jobCategories.find(c => c.id === showJobCategory)?.label}
-                      <span className="match-badge">{filteredJobs.length} matches</span>
+                      Available Opportunities
                     </h4>
-                    <div className="sort-options">
-                      <select className="sort-select">
-                        <option>Sort by: Best Match</option>
-                        <option>Sort by: Most Recent</option>
-                        <option>Sort by: Salary (High to Low)</option>
-                        <option>Sort by: Application Deadline</option>
-                      </select>
-                    </div>
                   </div>
                   
                   {filteredJobs.length === 0 ? (
                     <div className="no-jobs-found">
                       <Briefcase size={48} />
                       <h4>No opportunities found</h4>
-                      <p>Try adjusting your filters or check back later for new opportunities</p>
+                      <p>Try adjusting your filters</p>
                     </div>
                   ) : (
                     <div className="jobs-grid">
                       {filteredJobs.map(job => (
                         <div key={job.id} className="job-card">
-                          {job.urgent && (
-                            <div className="urgent-badge">
-                              <Zap size={12} />
-                              <span>URGENT HIRING</span>
-                            </div>
-                          )}
-                          
                           <div className="job-header">
                             <div className="company-logo">
                               <img src={job.logo} alt={job.company} className="logo-img" />
-                              {job.urgent && <div className="logo-glow"></div>}
                             </div>
                             <div className="job-main-info">
-                              <div className="job-title-row">
-                                <h4 className="job-title">{job.title}</h4>
-                                <span className="job-category">{job.category}</span>
-                              </div>
+                              <h4 className="job-title">{job.title}</h4>
                               <p className="job-company">
                                 <Building2 size={14} />
                                 <span>{job.company}</span>
@@ -2107,58 +1618,20 @@ function Home() {
                                 <span>{job.salary}</span>
                               </div>
                             </div>
-                            <div className="detail-row">
-                              <div className="detail-item">
-                                <Clock size={14} />
-                                <span>{job.type}</span>
-                              </div>
-                              <div className="detail-item">
-                                <Calendar size={14} />
-                                <span>{job.posted}</span>
-                              </div>
-                            </div>
                             
                             <div className="job-description">
                               <p>{job.description}</p>
                             </div>
-                            
-                            <div className="job-skills">
-                              {job.skills.map((skill, index) => (
-                                <span key={index} className="skill-tag">{skill}</span>
-                              ))}
-                            </div>
-                            
-                            {job.benefits && (
-                              <div className="job-benefits">
-                                <span className="benefits-label">Benefits:</span>
-                                <div className="benefits-list">
-                                  {job.benefits.map((benefit, index) => (
-                                    <span key={index} className="benefit-tag">{benefit}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
                           </div>
                           
                           <div className="job-footer">
-                            <div className="job-requirements">
-                              <span className="requirements-label">Requirements:</span>
-                              <span className="requirements-text">{job.requirements}</span>
-                            </div>
                             <div className="job-actions">
-                              <button className="job-action-btn view">
-                                <Eye size={16} />
-                                <span>View Details</span>
-                              </button>
                               <button 
                                 className="job-action-btn apply"
                                 onClick={() => handleApplyForJob(job.id)}
                               >
                                 <SendHorizontal size={16} />
                                 <span>Apply Now</span>
-                              </button>
-                              <button className="job-action-btn save">
-                                <Bookmark size={16} />
                               </button>
                             </div>
                           </div>
@@ -2167,62 +1640,10 @@ function Home() {
                     </div>
                   )}
                 </div>
-
-                {/* Enhanced Networking Tips */}
-                <div className="networking-tips">
-                  <div className="tips-header">
-                    <h4 className="tips-title">
-                      <Megaphone size={20} />
-                      Professional Networking Tips for South Africa
-                    </h4>
-                    <button className="refresh-tips-btn" onClick={() => setNotifications(prev => prev + 1)}>
-                      <RefreshCw size={16} />
-                    </button>
-                  </div>
-                  <div className="tips-list">
-                    {networkingTips.map((tip, index) => (
-                      <div key={index} className="tip-item">
-                        <CheckCircle2 size={16} />
-                        <span>{tip}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Job Application Stats */}
-                <div className="application-stats">
-                  <div className="stat-card">
-                    <div className="stat-card-icon">
-                      <Send size={24} />
-                    </div>
-                    <div className="stat-card-content">
-                      <span className="stat-card-number">{jobsApplied.length}</span>
-                      <span className="stat-card-label">Applications Sent</span>
-                    </div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-icon">
-                      <Clock size={24} />
-                    </div>
-                    <div className="stat-card-content">
-                      <span className="stat-card-number">3</span>
-                      <span className="stat-card-label">Interviews Scheduled</span>
-                    </div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-card-icon">
-                      <CheckCircle size={24} />
-                    </div>
-                    <div className="stat-card-content">
-                      <span className="stat-card-number">1</span>
-                      <span className="stat-card-label">Job Offers</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 
-            {/* COMMUNITY TAB - Enhanced Credibility Building */}
+            {/* COMMUNITY TAB */}
             {activeTab === 'community' && (
               <div className="community-tab">
                 <div className="community-header">
@@ -2230,10 +1651,9 @@ function Home() {
                     <Users size={28} />
                     <span>Build Your Credibility</span>
                   </h3>
-                  <p className="section-subtitle">Track your journey and submit referrals to increase your credibility score</p>
                 </div>
 
-                {/* Enhanced Credibility Dashboard */}
+                {/* Credibility Dashboard */}
                 <div className="credibility-dashboard">
                   <div className="dashboard-header">
                     <div className="score-display">
@@ -2243,87 +1663,27 @@ function Home() {
                       </div>
                       <div className="score-info">
                         <h4 className="score-title">Credibility Score</h4>
-                        <p className="score-description">Based on referrals, employment history, and community engagement in South Africa</p>
-                        <div className="score-progress">
-                          <div className="progress-bar">
-                            <div 
-                              className="progress-fill"
-                              style={{ width: `${credibilityScore}%` }}
-                            ></div>
-                          </div>
-                          <span className="progress-text">{credibilityScore}% complete</span>
-                        </div>
+                        <p className="score-description">Based on referrals, employment history, and community engagement</p>
                       </div>
-                    </div>
-                    
-                    <div className="score-breakdown">
-                      <h5 className="breakdown-title">Score Breakdown</h5>
-                      {credibilityMetrics.map((metric, index) => (
-                        <div key={index} className="metric-item">
-                          <div className="metric-label">
-                            <div 
-                              className="metric-dot"
-                              style={{ backgroundColor: metric.color }}
-                            ></div>
-                            <span className="metric-name">{metric.label}</span>
-                            <span className="metric-icon">{metric.icon}</span>
-                          </div>
-                          <div className="metric-details">
-                            <div className="metric-bar">
-                              <div 
-                                className="metric-fill"
-                                style={{ width: `${metric.score}%`, backgroundColor: metric.color }}
-                              ></div>
-                            </div>
-                            <span className="metric-value">{metric.score}% (+{metric.points} pts)</span>
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Enhanced Referral System */}
+                {/* Referral System */}
                 <div className="referral-system">
                   <div className="referral-header">
                     <h4 className="referral-title">
                       <FileText size={24} />
                       Submit Referral Documents
                     </h4>
-                    <p className="referral-subtitle">Upload documents to increase your credibility score</p>
-                  </div>
-                  
-                  <div className="referral-types">
-                    {referralTypes.map(type => (
-                      <div 
-                        key={type.id}
-                        className={`referral-type-card ${referralType === type.id ? 'selected' : ''}`}
-                        onClick={() => setReferralType(type.id)}
-                        style={{ borderLeftColor: type.color }}
-                      >
-                        <div className="type-icon">
-                          <type.icon size={24} />
-                        </div>
-                        <div className="type-details">
-                          <h5 className="type-name">{type.label}</h5>
-                          <p className="type-desc">{type.description}</p>
-                        </div>
-                        <div className="type-points">
-                          <span className="points-value">+{type.points} pts</span>
-                        </div>
-                      </div>
-                    ))}
                   </div>
                   
                   <div className="upload-section">
                     <div className="upload-card">
-                      <div className="upload-icon">
-                        <UploadCloud size={48} />
-                      </div>
                       <div className="upload-info">
-                        <h5 className="upload-title">Upload {referralTypes.find(t => t.id === referralType)?.label} Document</h5>
+                        <h5 className="upload-title">Upload Document</h5>
                         <p className="upload-description">
-                          Upload scanned copy or photo of your document. Accepted formats: PDF, JPG, PNG (Max 10MB)
+                          Upload scanned copy or photo of your document
                         </p>
                       </div>
                       <div className="upload-actions">
@@ -2349,53 +1709,16 @@ function Home() {
                         </label>
                       </div>
                     </div>
-                    
-                    {/* Uploaded Documents */}
-                    {referralDocuments.length > 0 && (
-                      <div className="uploaded-documents">
-                        <h5 className="documents-title">Recently Uploaded Documents</h5>
-                        <div className="documents-list">
-                          {referralDocuments.slice(0, 3).map(doc => (
-                            <div key={doc.id} className="document-item">
-                              <div className="document-icon">
-                                <FileText size={20} />
-                              </div>
-                              <div className="document-info">
-                                <span className="document-name">{doc.name}</span>
-                                <div className="document-meta">
-                                  <span className="document-type">{doc.type}</span>
-                                  <span className="document-date">{doc.date}</span>
-                                  <span className="document-points">+{doc.points} pts</span>
-                                  <span className="document-size">{doc.size}</span>
-                                </div>
-                              </div>
-                              <div className="document-actions">
-                                <button className="document-action">
-                                  <Eye size={16} />
-                                </button>
-                                <button className="document-action">
-                                  <Download size={16} />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
 
-                {/* Enhanced Rehabilitation Timeline */}
+                {/* Rehabilitation Timeline */}
                 <div className="timeline-section">
                   <div className="timeline-header">
                     <h4 className="timeline-title">
                       <Clock4 size={24} />
-                      Your Rehabilitation Journey in South Africa
+                      Your Rehabilitation Journey
                     </h4>
-                    <button className="edit-timeline-btn">
-                      <Edit size={16} />
-                      <span>Edit Timeline</span>
-                    </button>
                   </div>
                   
                   <div className="timeline-container">
@@ -2407,16 +1730,10 @@ function Home() {
                               className="marker-dot"
                               style={{ backgroundColor: item.color }}
                             ></div>
-                            {index < rehabilitationTimeline.length - 1 && (
-                              <div className="timeline-connector"></div>
-                            )}
                           </div>
                           <div className="timeline-content">
                             <div className="timeline-year">{item.year}</div>
-                            <div className="timeline-event-row">
-                              <span className="timeline-event-icon">{item.icon}</span>
-                              <h5 className="timeline-event">{item.event}</h5>
-                            </div>
+                            <h5 className="timeline-event">{item.event}</h5>
                             <p className="timeline-description">{item.description}</p>
                           </div>
                         </div>
@@ -2424,53 +1741,10 @@ function Home() {
                     </div>
                   </div>
                 </div>
-
-                {/* Community Events */}
-                <div className="community-events">
-                  <div className="events-header">
-                    <h4 className="events-title">
-                      <Calendar size={24} />
-                      Upcoming Community Events
-                    </h4>
-                    <button className="view-all-btn">View All</button>
-                  </div>
-                  <div className="events-grid">
-                    <div className="event-card">
-                      <div className="event-date">
-                        <span className="event-day">15</span>
-                        <span className="event-month">FEB</span>
-                      </div>
-                      <div className="event-details">
-                        <h5 className="event-title">Job Fair 2024 - Soweto</h5>
-                        <p className="event-description">Connect with employers and find opportunities</p>
-                        <div className="event-info">
-                          <span className="event-location">Soweto Expo Centre</span>
-                          <span className="event-time">9:00 AM - 4:00 PM</span>
-                        </div>
-                      </div>
-                      <button className="event-rsvp">RSVP</button>
-                    </div>
-                    <div className="event-card">
-                      <div className="event-date">
-                        <span className="event-day">22</span>
-                        <span className="event-month">FEB</span>
-                      </div>
-                      <div className="event-details">
-                        <h5 className="event-title">Skills Workshop - Johannesburg</h5>
-                        <p className="event-description">Learn interview skills and resume writing</p>
-                        <div className="event-info">
-                          <span className="event-location">Johannesburg Career Centre</span>
-                          <span className="event-time">2:00 PM - 5:00 PM</span>
-                        </div>
-                      </div>
-                      <button className="event-rsvp">RSVP</button>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 
-            {/* MESSAGES TAB - Enhanced Communication */}
+            {/* MESSAGES TAB */}
             {activeTab === 'messages' && (
               <div className="messages-tab">
                 <div className="messages-header">
@@ -2478,64 +1752,34 @@ function Home() {
                     <MessageCircle size={28} />
                     <span>Messages</span>
                   </h3>
-                  <p className="section-subtitle">Communicate with verified South African employers only</p>
                 </div>
 
                 <div className="messages-container">
-                  {/* Enhanced Conversations List */}
+                  {/* Conversations List */}
                   <div className="conversations-sidebar">
-                    <div className="conversations-header">
-                      <h4 className="conversations-title">Employer Conversations</h4>
-                      <div className="conversation-filters">
-                        <button className="filter-btn active">All</button>
-                        <button className="filter-btn">Unread</button>
-                        <button className="filter-btn">
-                          <Archive size={16} />
-                        </button>
-                      </div>
-                    </div>
-                    
                     <div className="conversations-list">
                       {conversations.map(convo => (
                         <div 
                           key={convo.id}
-                          className={`conversation-item ${selectedConversation?.id === convo.id ? 'active' : ''} ${convo.unread ? 'unread' : ''}`}
+                          className={`conversation-item ${selectedConversation?.id === convo.id ? 'active' : ''}`}
                           onClick={() => {
                             setSelectedConversation(convo);
                             setMessages(convo.messages);
-                            convo.unread = false;
                           }}
                         >
                           <div className="conversation-avatar">
                             <img src={convo.logo} alt={convo.employer} className="employer-logo" />
-                            {convo.verified && (
-                              <div className="verified-indicator">
-                                <ShieldCheck size={10} />
-                              </div>
-                            )}
                           </div>
                           <div className="conversation-details">
-                            <div className="conversation-header">
-                              <h5 className="employer-name">{convo.employer}</h5>
-                              <span className="conversation-time">{convo.time}</span>
-                            </div>
+                            <h5 className="employer-name">{convo.employer}</h5>
                             <p className="conversation-preview">{convo.lastMessage}</p>
-                            <div className="conversation-status">
-                              {convo.verified && (
-                                <span className="verified-badge-small">
-                                  <ShieldCheck size={10} />
-                                  Verified
-                                </span>
-                              )}
-                              {convo.unread && <span className="unread-indicator"></span>}
-                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Enhanced Chat Area */}
+                  {/* Chat Area */}
                   <div className="chat-area">
                     {selectedConversation ? (
                       <>
@@ -2546,31 +1790,13 @@ function Home() {
                             </div>
                             <div className="partner-info">
                               <h4 className="partner-name">{selectedConversation.employer}</h4>
-                              <div className="partner-status">
-                                <div className="status-dot online"></div>
-                                <span>Verified South African Employer • Online</span>
-                              </div>
                             </div>
-                          </div>
-                          <div className="chat-actions">
-                            <button className="chat-action-btn">
-                              <Phone size={18} />
-                            </button>
-                            <button className="chat-action-btn">
-                              <Archive size={18} />
-                            </button>
-                            <button className="chat-action-btn">
-                              <MoreVertical size={18} />
-                            </button>
                           </div>
                         </div>
                         
                         <div className="chat-messages">
                           {messages.length > 0 ? (
                             <>
-                              <div className="message-date">
-                                <span>Today</span>
-                              </div>
                               {messages.map(message => (
                                 <div 
                                   key={message.id} 
@@ -2585,9 +1811,7 @@ function Home() {
                             </>
                           ) : (
                             <div className="no-messages">
-                              <MessageSquare size={48} />
-                              <h4>Start a conversation</h4>
-                              <p>Send your first message to {selectedConversation.employer}</p>
+                              <p>Start a conversation with {selectedConversation.employer}</p>
                             </div>
                           )}
                           <div ref={messageEndRef} />
@@ -2603,38 +1827,20 @@ function Home() {
                               className="message-input"
                               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                             />
-                            <div className="input-actions">
-                              <button className="input-action-btn">
-                                <Image size={18} />
-                              </button>
-                              <button className="input-action-btn">
-                                <FileText size={18} />
-                              </button>
-                              <button 
-                                className="send-message-btn"
-                                onClick={handleSendMessage}
-                                disabled={!messageInput.trim()}
-                              >
-                                <Send size={20} />
-                              </button>
-                            </div>
+                            <button 
+                              className="send-message-btn"
+                              onClick={handleSendMessage}
+                              disabled={!messageInput.trim()}
+                            >
+                              <Send size={20} />
+                            </button>
                           </div>
                         </div>
                       </>
                     ) : (
                       <div className="no-conversation-selected">
-                        <MessageCircle size={64} />
+                        <MessageCircle size={48} />
                         <h4>Select a conversation</h4>
-                        <p>Choose a South African employer from the list to start messaging</p>
-                        <div className="messaging-tips">
-                          <h5>Messaging Tips:</h5>
-                          <ul>
-                            <li>Be professional and respectful</li>
-                            <li>Clearly state your purpose</li>
-                            <li>Attach relevant documents if needed</li>
-                            <li>Follow up politely if no response</li>
-                          </ul>
-                        </div>
                       </div>
                     )}
                   </div>
@@ -2642,7 +1848,7 @@ function Home() {
               </div>
             )}
 
-            {/* PROFILE TAB - Enhanced User Profile */}
+            {/* PROFILE TAB */}
             {activeTab === 'profile' && (
               <div className="profile-tab">
                 <div className="profile-header-section">
@@ -2653,58 +1859,22 @@ function Home() {
                       ) : (
                         <span className="avatar-initial-large">{user?.name?.charAt(0) || "U"}</span>
                       )}
-                      <button 
-                        className="change-photo-btn"
-                        onClick={() => profilePicRef.current?.click()}
-                      >
-                        <Camera size={16} />
-                        <span>Change Photo</span>
-                      </button>
-                      <input
-                        type="file"
-                        ref={profilePicRef}
-                        accept="image/*"
-                        onChange={handleProfilePictureUpload}
-                        style={{ display: 'none' }}
-                      />
                     </div>
                     <div className="profile-info-main">
                       <h2 className="profile-name">{user?.name || "Your Name"}</h2>
                       <p className="profile-title">RE-Link Member - South Africa</p>
-                      <div className="profile-stats">
-                        <div className="profile-stat-item">
-                          <span className="stat-number">{credibilityScore}</span>
-                          <span className="stat-label">Credibility</span>
-                        </div>
-                        <div className="profile-stat-item">
-                          <span className="stat-number">{jobsApplied.length}</span>
-                          <span className="stat-label">Applications</span>
-                        </div>
-                        <div className="profile-stat-item">
-                          <span className="stat-number">{referralDocuments.length}</span>
-                          <span className="stat-label">Documents</span>
-                        </div>
-                        <div className="profile-stat-item">
-                          <span className="stat-number">{appointments.length}</span>
-                          <span className="stat-label">Appointments</span>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="profile-content">
-                  {/* Enhanced Personal Information */}
+                  {/* Personal Information */}
                   <div className="profile-section">
                     <div className="section-header">
                       <h3 className="section-title">
                         <UserCheck size={24} />
                         <span>Personal Information</span>
                       </h3>
-                      <button className="edit-section-btn">
-                        <Edit size={16} />
-                        <span>Edit</span>
-                      </button>
                     </div>
                     
                     <div className="personal-info-grid">
@@ -2721,149 +1891,37 @@ function Home() {
                         <span className="info-value">+27 {user?.phone || "Not provided"}</span>
                       </div>
                       <div className="info-item">
-                        <span className="info-label">ID Number</span>
-                        <span className="info-value">{user?.idNumber || "Not provided"}</span>
-                      </div>
-                      <div className="info-item">
-                        <span className="info-label">Date of Birth</span>
-                        <span className="info-value">{user?.dob || "Not provided"}</span>
-                      </div>
-                      <div className="info-item">
                         <span className="info-label">Location</span>
                         <span className="info-value">{user?.location || "Not provided"}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Sensitive Information Section */}
-                  <div className="profile-section">
-                    <div className="section-header">
-                      <h3 className="section-title">
-                        <Shield size={24} />
-                        <span>Sensitive Information</span>
-                        <span className="section-badge">Visible to Verified South African Recruiters Only</span>
-                      </h3>
-                      <button 
-                        className="toggle-sensitive-btn"
-                        onClick={() => setShowSensitiveInfo(!showSensitiveInfo)}
-                      >
-                        {showSensitiveInfo ? <EyeOff size={16} /> : <Eye size={16} />}
-                        <span>{showSensitiveInfo ? 'Hide' : 'Show'}</span>
-                      </button>
-                    </div>
-                    
-                    {showSensitiveInfo ? (
-                      <div className="sensitive-info-grid">
-                        <div className="info-item">
-                          <span className="info-label">Correctional Facility</span>
-                          <span className="info-value">Johannesburg Correctional Centre</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Sentence Duration</span>
-                          <span className="info-value">2019 - 2023 (4 years)</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Offense Category</span>
-                          <span className="info-value">Non-violent property crime</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Parole Officer</span>
-                          <span className="info-value">Officer Sarah Johnson (SAPS)</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Parole End Date</span>
-                          <span className="info-value">December 2025</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Rehabilitation Status</span>
-                          <span className="info-value success">Completed</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="sensitive-info-hidden">
-                        <Lock size={32} />
-                        <p>This information is hidden and only visible to verified South African recruiters</p>
-                        <button 
-                          className="show-sensitive-btn"
-                          onClick={() => setShowSensitiveInfo(true)}
-                        >
-                          <Eye size={16} />
-                          <span>Show to View</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Enhanced Skills & Education */}
+                  {/* Skills & Education */}
                   <div className="profile-section">
                     <div className="section-header">
                       <h3 className="section-title">
                         <GraduationCap size={24} />
-                        <span>Skills, Education & Certificates</span>
+                        <span>Skills</span>
                       </h3>
-                      <button className="add-item-btn">
-                        <Plus size={16} />
-                        <span>Add</span>
-                      </button>
                     </div>
                     
                     <div className="skills-section">
-                      <h4 className="subsection-title">Skills</h4>
                       <div className="skills-list">
                         {["Construction", "Leadership", "Team Management", "Safety Compliance", "Problem Solving", "Communication"].map((skill, index) => (
                           <span key={index} className="skill-tag">{skill}</span>
                         ))}
                       </div>
                     </div>
-                    
-                    <div className="education-section">
-                      <h4 className="subsection-title">Education & Certificates</h4>
-                      <div className="education-list">
-                        <div className="education-item">
-                          <div className="edu-icon">
-                            <Award size={20} />
-                          </div>
-                          <div className="edu-details">
-                            <h5 className="edu-title">Construction Management Certificate</h5>
-                            <p className="edu-institution">SA Technical Training Centre, Johannesburg</p>
-                            <span className="edu-year">2022</span>
-                          </div>
-                        </div>
-                        <div className="education-item">
-                          <div className="edu-icon">
-                            <Award size={20} />
-                          </div>
-                          <div className="edu-details">
-                            <h5 className="edu-title">Forklift Operator License</h5>
-                            <p className="edu-institution">SA Construction Authority</p>
-                            <span className="edu-year">2023</span>
-                          </div>
-                        </div>
-                        <div className="education-item">
-                          <div className="edu-icon">
-                            <Award size={20} />
-                          </div>
-                          <div className="edu-details">
-                            <h5 className="edu-title">Health & Safety Training</h5>
-                            <p className="edu-institution">Construction Safety Board of SA</p>
-                            <span className="edu-year">2023</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
-                  {/* Enhanced Work Experience */}
+                  {/* Work Experience */}
                   <div className="profile-section">
                     <div className="section-header">
                       <h3 className="section-title">
                         <Briefcase size={24} />
-                        <span>Work Experience in South Africa</span>
+                        <span>Work Experience</span>
                       </h3>
-                      <button className="add-item-btn">
-                        <Plus size={16} />
-                        <span>Add Experience</span>
-                      </button>
                     </div>
                     
                     <div className="experience-list">
@@ -2873,9 +1931,8 @@ function Home() {
                         </div>
                         <div className="exp-details">
                           <h5 className="exp-title">Construction Supervisor</h5>
-                          <p className="exp-company">BuildRight Construction, Soweto</p>
+                          <p className="exp-company">BuildRight Construction</p>
                           <span className="exp-duration">2023 - Present</span>
-                          <p className="exp-description">Leading construction projects, managing teams of 15+, ensuring safety compliance, and coordinating with clients.</p>
                         </div>
                       </div>
                       <div className="experience-item">
@@ -2884,78 +1941,35 @@ function Home() {
                         </div>
                         <div className="exp-details">
                           <h5 className="exp-title">Construction Worker</h5>
-                          <p className="exp-company">BuildRight Construction, Soweto</p>
-                          <span className="exp-duration">2023 - 2023 (6 months)</span>
-                          <p className="exp-description">General construction work, team collaboration, following safety protocols, and learning advanced skills.</p>
-                        </div>
-                      </div>
-                      <div className="experience-item">
-                        <div className="exp-icon">
-                          <Briefcase size={20} />
-                        </div>
-                        <div className="exp-details">
-                          <h5 className="exp-title">Warehouse Assistant</h5>
-                          <p className="exp-company">Unitrans Logistics, Johannesburg</p>
-                          <span className="exp-duration">2023 - 2023 (3 months)</span>
-                          <p className="exp-description">Inventory management, packing, shipping, and assisting with warehouse operations.</p>
+                          <p className="exp-company">BuildRight Construction</p>
+                          <span className="exp-duration">2023 (6 months)</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Enhanced Account Actions */}
+                  {/* Account Actions */}
                   <div className="profile-section">
                     <div className="section-header">
                       <h3 className="section-title">
                         <Settings size={24} />
-                        <span>Account Settings</span>
+                        <span>Account</span>
                       </h3>
                     </div>
                     
                     <div className="account-actions">
-                      <button className="account-action-btn">
-                        <DownloadCloud size={18} />
-                        <div className="action-content">
-                          <span className="action-title">Export Data</span>
-                          <span className="action-desc">Download all your RE-Link data</span>
-                        </div>
-                        <ChevronRight size={16} />
-                      </button>
-                      
-                      <button className="account-action-btn">
-                        <Shield size={18} />
-                        <div className="action-content">
-                          <span className="action-title">Privacy Settings</span>
-                          <span className="action-desc">Manage your privacy preferences</span>
-                        </div>
-                        <ChevronRight size={16} />
-                      </button>
-                      
-                      <button className="account-action-btn">
-                        <BellRing size={18} />
-                        <div className="action-content">
-                          <span className="action-title">Notifications</span>
-                          <span className="action-desc">Configure your notification settings</span>
-                        </div>
-                        <ChevronRight size={16} />
-                      </button>
-                      
                       <button className="account-action-btn logout" onClick={handleLogout}>
                         <LogOut size={18} />
                         <div className="action-content">
                           <span className="action-title">Logout</span>
-                          <span className="action-desc">Sign out of your account</span>
                         </div>
-                        <ChevronRight size={16} />
                       </button>
                       
                       <button className="account-action-btn delete" onClick={handleDeleteAccount}>
                         <Trash2 size={18} />
                         <div className="action-content">
                           <span className="action-title">Delete Account</span>
-                          <span className="action-desc">Permanently remove your account</span>
                         </div>
-                        <ChevronRight size={16} />
                       </button>
                     </div>
                   </div>
@@ -2965,7 +1979,7 @@ function Home() {
           </div>
         </main>
 
-        {/* Enhanced Footer */}
+        {/* Footer */}
         <footer className="main-footer">
           <div className="footer-container">
             <div className="footer-left">
@@ -2976,25 +1990,10 @@ function Home() {
                   <p>Second Chances, Real Connections</p>
                 </div>
               </div>
-              <p className="footer-partnership">Official Partner: Department of Correctional Services South Africa</p>
-              <div className="footer-certs">
-                <span className="footer-cert">
-                  <ShieldCheck size={14} />
-                  <span>POPIA Compliant</span>
-                </span>
-                <span className="footer-cert">
-                  <Shield size={14} />
-                  <span>Secure Platform</span>
-                </span>
-              </div>
             </div>
             
             <div className="footer-right">
               <div className="footer-links">
-                <a href="#" className="footer-link">
-                  <HelpCircle size={14} />
-                  <span>Help Center</span>
-                </a>
                 <a href="#" className="footer-link">
                   <Shield size={14} />
                   <span>Privacy Policy</span>
@@ -3003,28 +2002,10 @@ function Home() {
                   <FileText size={14} />
                   <span>Terms of Service</span>
                 </a>
-                <a href="#" className="footer-link">
-                  <Phone size={14} />
-                  <span>Contact Support</span>
-                </a>
               </div>
               <p className="footer-copyright">
-                © {new Date().getFullYear()} RE-Link South Africa. All rights reserved.
+                © {new Date().getFullYear()} RE-Link South Africa
               </p>
-              <div className="footer-social">
-                <a href="#" className="social-link">
-                  <Facebook size={16} />
-                </a>
-                <a href="#" className="social-link">
-                  <Twitter size={16} />
-                </a>
-                <a href="#" className="social-link">
-                  <Linkedin size={16} />
-                </a>
-                <a href="#" className="social-link">
-                  <Instagram size={16} />
-                </a>
-              </div>
             </div>
           </div>
         </footer>
