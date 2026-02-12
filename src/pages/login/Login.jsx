@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, 
   Shield, ShieldCheck, Users, Sparkles, Zap,
-  LogIn, HeartHandshake, CheckCircle, AlertCircle,
-  Fingerprint, ArrowLeft, Home, Globe, Key,
+  HeartHandshake, CheckCircle, AlertCircle,
+  Key, ArrowLeft, Home, Globe, 
   User, Phone, MapPin, ExternalLink, Building, UserCheck
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -21,7 +21,7 @@ function Login() {
     password: "",
   });
   
-  const [userType, setUserType] = useState("applicant"); // "applicant" or "recruiter"
+  const [userType, setUserType] = useState("applicant");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -36,31 +36,14 @@ function Login() {
   const [fieldFocus, setFieldFocus] = useState({});
   const [logoLoaded, setLogoLoaded] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [showDemoCreds, setShowDemoCreds] = useState(false);
-
-  // Demo credentials for each user type
-  const demoCredentials = {
-    applicant: {
-      email: "applicant@relink.co.za",
-      password: "Demo123!"
-    },
-    recruiter: {
-      email: "recruiter@relink.co.za",
-      password: "Recruiter123!"
-    }
-  };
 
   // Get any registration success message from navigation state
   const registrationMessage = location.state?.message;
   const registeredEmail = location.state?.email;
   const registeredUserType = location.state?.userType;
 
-  // Initialize with demo credentials if in development
+  // Initialize with saved credentials if they exist
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      setFormData(demoCredentials.applicant);
-    }
-
     // Check for saved credentials
     const savedEmail = localStorage.getItem('relink_email');
     const savedRememberMe = localStorage.getItem('relink_remember') === 'true';
@@ -83,13 +66,6 @@ function Login() {
       setTimeout(() => setSuccessMessage(""), 5000);
     }
   }, [registrationMessage, registeredUserType]);
-
-  // Update demo credentials when user type changes
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && showDemoCreds) {
-      setFormData(demoCredentials[userType]);
-    }
-  }, [userType, showDemoCreds]);
 
   // Generate floating animation dots
   useEffect(() => {
@@ -123,7 +99,7 @@ function Login() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(value);
       case 'password':
-        return value.length >= 6; // Minimum 6 characters for login
+        return value.length >= 6;
       default:
         return true;
     }
@@ -217,7 +193,7 @@ function Login() {
     return Object.keys(newErrors).length === 0;
   }, [formData, validateField]);
 
-  // Enhanced login submit
+  // API login handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
@@ -236,8 +212,29 @@ function Login() {
       setTimeout(() => submitBtn.classList.remove('clicked'), 300);
     }
     
-    // Simulate API call with timeout
-    setTimeout(() => {
+    try {
+      const API_BASE_URL = 'http://localhost:9090/api';
+      
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await response.text();
+
+      if (!response.ok) {
+        throw new Error(data || 'Login failed. Please check your credentials.');
+      }
+
+      // Login successful
+      const token = data;
+      
       // Save to localStorage if remember me is checked
       if (rememberMe) {
         localStorage.setItem('relink_email', formData.email);
@@ -249,11 +246,10 @@ function Login() {
         localStorage.removeItem('relink_userType');
       }
       
-      // Save a mock token to localStorage (for demo purposes only)
-      localStorage.setItem('relink_token', 'demo-token-12345');
+      // Save the JWT token and user info
+      localStorage.setItem('relink_token', token);
       localStorage.setItem('relink_user', JSON.stringify({
         email: formData.email,
-        name: formData.email.split('@')[0],
         type: userType
       }));
       
@@ -272,24 +268,13 @@ function Login() {
         }
       }, 1500);
       
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoginError(error.message || 'An error occurred during login. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
-  };
-
-  // Demo login handler
-  const handleDemoLogin = useCallback(() => {
-    setFormData(demoCredentials[userType]);
-    
-    // Add animation to demo button
-    const btn = document.querySelector('.demo-login-btn');
-    if (btn) {
-      btn.classList.add('pulse');
-      setTimeout(() => btn.classList.remove('pulse'), 1000);
     }
-    
-    setShowDemoCreds(true);
-    setTimeout(() => setShowDemoCreds(false), 5000);
-  }, [userType]);
+  };
 
   // Forgot password handler
   const handleForgotPassword = () => {
@@ -529,47 +514,6 @@ function Login() {
                 </>
               )}
             </div>
-            
-            {/* Demo Login Button */}
-            <button 
-              className="demo-login-btn"
-              onClick={handleDemoLogin}
-              type="button"
-            >
-              <div className="demo-icon-container">
-                <Zap size={18} />
-              </div>
-              <span>Try {userType === 'recruiter' ? 'Recruiter' : 'Applicant'} Demo</span>
-            </button>
-            
-            {/* Demo Credentials Note */}
-            {showDemoCreds && (
-              <div className="demo-credentials-card">
-                <div className="demo-card-glow"></div>
-                <div className="demo-content">
-                  <div className="demo-header">
-                    <Sparkles size={16} />
-                    <span>Demo Credentials Loaded</span>
-                  </div>
-                  <div className="demo-info">
-                    <div className="demo-field">
-                      <span className="demo-label">User Type:</span>
-                      <span className={`demo-value ${userType === 'recruiter' ? 'recruiter-value' : 'applicant-value'}`}>
-                        {userType === 'recruiter' ? 'Recruiter' : 'Applicant'}
-                      </span>
-                    </div>
-                    <div className="demo-field">
-                      <span className="demo-label">Email:</span>
-                      <span className="demo-value">{formData.email}</span>
-                    </div>
-                    <div className="demo-field">
-                      <span className="demo-label">Password:</span>
-                      <span className="demo-value">{formData.password}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Section - Login Form */}
@@ -808,7 +752,7 @@ function Login() {
                   )}
                 </button>
 
-                {/* Form Footer - Simplified without social login */}
+                {/* Form Footer */}
                 <div className="form-footer">
                   <p className="signup-prompt">
                     {userType === 'recruiter' ? 'Need a recruiter account?' : 'New to RE-Link?'}{' '}
