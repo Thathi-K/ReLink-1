@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  BriefcaseBusiness, Filter, MapPin, Briefcase,
-  Building2, SendHorizontal, Clock
+  BriefcaseBusiness,
+  Filter,
+  MapPin,
+  Briefcase,
+  Building2,
+  SendHorizontal,
 } from "lucide-react";
+import jobService from "../../../../../services/jobService"; // your singleton service
 
-function NetworkingTab({ 
-  user, 
-  featuredJobs, 
-  industries, 
-  locations, 
-  jobTypes,
-  jobCategories,
-  onApplyForJob 
-}) {
+function NetworkingTab({ user, industries, locations, jobTypes, jobCategories, onApplyForJob }) {
+  const [jobs, setJobs] = useState([]);
   const [selectedIndustry, setSelectedIndustry] = useState("All Industries");
   const [selectedLocation, setSelectedLocation] = useState("All Locations");
   const [jobType, setJobType] = useState("All Types");
   const [showJobCategory, setShowJobCategory] = useState("All");
 
-  const filteredJobs = featuredJobs.filter(job => {
-    if (selectedIndustry !== "All Industries" && job.industry !== selectedIndustry) return false;
-    if (selectedLocation !== "All Locations" && job.location !== selectedLocation) return false;
+  // Subscribe to jobService updates
+  useEffect(() => {
+    setJobs(jobService.getJobs()); // initial load
+    const unsubscribe = jobService.subscribe(setJobs); // re-render on changes
+    return unsubscribe;
+  }, []);
+
+  const filteredJobs = jobs.filter((job) => {
+    if (selectedIndustry !== "All Industries" && job.industry !== selectedIndustry)
+      return false;
+    if (selectedLocation !== "All Locations" && job.location !== selectedLocation)
+      return false;
     if (jobType !== "All Types" && job.type !== jobType) return false;
     if (showJobCategory !== "All" && job.category !== showJobCategory) return false;
     return true;
@@ -35,6 +42,7 @@ function NetworkingTab({
         </h3>
       </div>
 
+      {/* Filters */}
       <div className="filters-section">
         <div className="filters-grid">
           <FilterGroup
@@ -61,6 +69,7 @@ function NetworkingTab({
         </div>
       </div>
 
+      {/* Jobs list */}
       <div className="jobs-section">
         <div className="jobs-header">
           <h4 className="jobs-title">Available Opportunities</h4>
@@ -70,12 +79,8 @@ function NetworkingTab({
           <NoJobsFound />
         ) : (
           <div className="jobs-grid">
-            {filteredJobs.map(job => (
-              <JobCard 
-                key={job.id} 
-                job={job} 
-                onApply={() => onApplyForJob(job)}
-              />
+            {filteredJobs.map((job) => (
+              <JobCard key={job.id} job={job} onApply={() => onApplyForJob(job)} />
             ))}
           </div>
         )}
@@ -84,6 +89,7 @@ function NetworkingTab({
   );
 }
 
+// --- Filter dropdown ---
 function FilterGroup({ icon: Icon, label, value, onChange, options }) {
   return (
     <div className="filter-group">
@@ -91,19 +97,18 @@ function FilterGroup({ icon: Icon, label, value, onChange, options }) {
         <Icon size={16} />
         {label}
       </label>
-      <select 
-        className="filter-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {options.map(option => (
-          <option key={option} value={option}>{option}</option>
+      <select className="filter-select" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </select>
     </div>
   );
 }
 
+// --- Job card ---
 function JobCard({ job, onApply }) {
   return (
     <div className="job-card">
@@ -118,7 +123,7 @@ function JobCard({ job, onApply }) {
             <span>{job.company}</span>
           </p>
           <div className="job-match">
-            <span className="match-score">{job.matches}</span>
+            <span className="match-score">{job.match}</span>
             <span className="job-type">{job.type}</span>
           </div>
         </div>
@@ -135,7 +140,6 @@ function JobCard({ job, onApply }) {
             <span>{job.salary}</span>
           </div>
         </div>
-
         <div className="job-description">
           <p>{job.description}</p>
         </div>
@@ -153,6 +157,7 @@ function JobCard({ job, onApply }) {
   );
 }
 
+// --- No jobs found ---
 function NoJobsFound() {
   return (
     <div className="no-jobs-found">

@@ -1,98 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../../components/Sidebar/Sidebar.jsx';
 import TopBar from '../../../components/TopBar/TopBar.jsx';
-import { FaBuilding, FaMapMarkerAlt, FaClock, FaDollarSign, FaCalendarAlt, FaStar } from 'react-icons/fa';
+import { FaBuilding, FaMapMarkerAlt, FaClock, FaDollarSign, FaCalendarAlt, FaStar, FaRegStar } from 'react-icons/fa';
 import './JobOpportunities.css';
+import jobService from '../../../services/jobService';
 
 const JobOpportunities = () => {
-  const [jobs, setJobs] = useState([
-    {
-      id: 1,
-      title: 'Frontend Developer',
-      company: 'Tech Solutions Inc.',
-      location: 'Remote',
-      type: 'Full-time',
-      posted: '2024-01-15',
-      salary: '$80,000 - $100,000',
-      description: 'We are looking for a skilled Frontend Developer to join our team. You will be responsible for building user interfaces and implementing designs.',
-      requirements: ['3+ years of React experience', 'Strong JavaScript skills', 'Experience with CSS frameworks', 'Understanding of REST APIs'],
-      skills: ['React', 'JavaScript', 'CSS', 'HTML5', 'Git'],
-      match: 95,
-      applied: false,
-    },
-    {
-      id: 2,
-      title: 'Junior Software Engineer',
-      company: 'Innovate Co.',
-      location: 'New York, NY',
-      type: 'Full-time',
-      posted: '2024-01-14',
-      salary: '$70,000 - $85,000',
-      description: 'Entry-level position for motivated individuals looking to start their career in software development.',
-      requirements: ['Bachelor\'s degree in CS or related', 'Basic programming knowledge', 'Willingness to learn', 'Good problem-solving skills'],
-      skills: ['JavaScript', 'Python', 'SQL', 'Git'],
-      match: 87,
-      applied: false,
-    },
-    {
-      id: 3,
-      title: 'Web Developer',
-      company: 'Digital Agency',
-      location: 'Chicago, IL',
-      type: 'Contract',
-      posted: '2024-01-13',
-      salary: '$60/hr',
-      description: 'Contract position for website development and maintenance projects.',
-      requirements: ['5+ years web development experience', 'Portfolio of previous work', 'Experience with CMS platforms', 'Client communication skills'],
-      skills: ['HTML/CSS', 'JavaScript', 'WordPress', 'PHP', 'Responsive Design'],
-      match: 82,
-      applied: true,
-    },
-    {
-      id: 4,
-      title: 'UI Developer',
-      company: 'Design Studio',
-      location: 'Remote',
-      type: 'Full-time',
-      posted: '2024-01-12',
-      salary: '$85,000 - $110,000',
-      description: 'Focus on creating beautiful, functional user interfaces for web applications.',
-      requirements: ['Experience with design systems', 'Figma/Sketch knowledge', 'Attention to detail', 'Collaboration skills'],
-      skills: ['React', 'TypeScript', 'Figma', 'UI/UX Design', 'CSS-in-JS'],
-      match: 78,
-      applied: false,
-    },
-    {
-      id: 5,
-      title: 'Full Stack Developer',
-      company: 'Startup XYZ',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      posted: '2024-01-10',
-      salary: '$90,000 - $120,000',
-      description: 'Join our early-stage startup and work on both frontend and backend systems.',
-      requirements: ['Full stack development experience', 'Startup mindset', 'Ability to work independently', 'Quick learning ability'],
-      skills: ['React', 'Node.js', 'MongoDB', 'AWS', 'Docker'],
-      match: 75,
-      applied: false,
-    },
-  ]);
-
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     location: '',
     type: '',
     minMatch: 0,
   });
 
+  useEffect(() => {
+    // Load jobs
+    setJobs(jobService.getJobs());
+    setLoading(false);
+
+    // Subscribe to job updates
+    const unsubscribe = jobService.subscribe((updatedJobs) => {
+      setJobs(updatedJobs.filter(job => job.status === 'active'));
+    });
+
+    return unsubscribe;
+  }, []);
+
   const handleApply = (jobId) => {
-    console.log(`Applying for job ${jobId}`);
-    setJobs(jobs.map(job => 
-      job.id === jobId ? { ...job, applied: true } : job
-    ));
+    const success = jobService.applyForJob(jobId, 'current-user-id');
+    if (success) {
+      alert('Application submitted successfully!');
+    }
   };
 
   const handleSave = (jobId) => {
-    console.log(`Saving job ${jobId}`);
+    const isSaved = jobService.toggleSaveJob(jobId, 'current-user-id');
+    // Update local state to reflect the change
+    setJobs(jobs.map(job => 
+      job.id === jobId ? { ...job, saved: isSaved } : job
+    ));
   };
 
   const handleFilterChange = (filter, value) => {
@@ -102,6 +49,7 @@ const JobOpportunities = () => {
     }));
   };
 
+  // Apply filters
   const filteredJobs = jobs.filter(job => {
     if (filters.location && !job.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
     if (filters.type && job.type !== filters.type) return false;
@@ -109,16 +57,26 @@ const JobOpportunities = () => {
     return true;
   });
 
+  if (loading) {
+    return (
+      <div>
+        <Sidebar />
+        <div className="job-page-wrapper" style={{ marginLeft: '200px' }}>
+          <TopBar />
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading jobs...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* Sidebar fixed */}
       <Sidebar />
-
-      {/* Wrapper for TopBar + page content */}
       <div className="job-page-wrapper" style={{ marginLeft: '200px' }}>
         <TopBar />
-
-        {/* Job Opportunities Content */}
         <div className="job-opportunities-page">
           <div className="jobs-header">
             <h1 className="jobs-title">Job Opportunities</h1>
@@ -208,7 +166,7 @@ const JobOpportunities = () => {
                       onClick={() => handleSave(job.id)}
                       title={job.saved ? 'Remove from saved' : 'Save job'}
                     >
-                      <FaStar />
+                      {job.saved ? <FaStar /> : <FaRegStar />}
                     </button>
                   </div>
                 </div>
