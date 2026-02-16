@@ -541,7 +541,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0;
+  min-width: 0; /* ensures child elements can shrink properly */
+  max-width: 200px; /* optional: limit the width to prevent jumps */
 }
 
 .profile-name {
@@ -551,6 +552,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0; /* important for flex shrinking */
 }
 
 .profile-type {
@@ -559,9 +561,11 @@ body {
   background: var(--white-200);
   padding: 2px 6px;
   border-radius: var(--radius-full);
-  display: inline-block;
-  width: fit-content;
+  display: block; /* make it full width of container */
+  max-width: 100%; /* ensures it doesn’t expand beyond container */
+  text-align: left;
 }
+
 
 .credibility-score {
   display: flex;
