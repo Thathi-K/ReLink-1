@@ -18,9 +18,12 @@ import {
 // ==========================
 // Mock Images
 // ==========================
-const UserJourney1 = "https://via.placeholder.com/600x400/10b981/ffffff?text=Soweto+Success";
-const UserJourney2 = "https://via.placeholder.com/600x400/059669/ffffff?text=Cape+Town+Journey";
-const CompanyPost1 = "https://via.placeholder.com/600x400/3b82f6/ffffff?text=SA+Job+Fair";
+const UserJourney1 =
+  "https://via.placeholder.com/600x400/10b981/ffffff?text=Soweto+Success";
+const UserJourney2 =
+  "https://via.placeholder.com/600x400/059669/ffffff?text=Cape+Town+Journey";
+const CompanyPost1 =
+  "https://via.placeholder.com/600x400/3b82f6/ffffff?text=SA+Job+Fair";
 
 
 // ==========================
@@ -34,7 +37,7 @@ export const motivationalPosts = [
     role: "Construction Manager",
     icon: "👷",
     content:
-      "Three years ago, I walked out of prison with nothing but hope. Today, I'm leading a team of 15 at BuildRight Construction in Soweto. Your past doesn't define your future.",
+      "Three years ago, I walked out of prison with nothing but hope. Today, I'm leading a team of 15 at BuildRight Construction in Soweto.",
     image: UserJourney1,
     timestamp: "2 hours ago",
     likes: 142,
@@ -60,23 +63,6 @@ export const motivationalPosts = [
     postType: "company",
     verified: true,
     allowComments: true
-  },
-  {
-    id: 3,
-    user: "Mike T.",
-    userType: "ex-convict",
-    role: "Warehouse Supervisor",
-    icon: "👤",
-    content:
-      "Completed my forklift certification today at the Johannesburg Training Centre! Never stop learning!",
-    image: UserJourney2,
-    timestamp: "5 hours ago",
-    likes: 89,
-    comments: [],
-    shares: 15,
-    postType: "achievement",
-    verified: false,
-    allowComments: true
   }
 ];
 
@@ -96,14 +82,12 @@ export const featuredJobs = [
     matches: "95% match",
     urgent: true,
     posted: "2 hours ago",
-    skills: ["Leadership", "Construction", "Safety", "Team Management"],
+    skills: ["Leadership", "Construction", "Safety"],
     industry: "Construction",
-    description:
-      "Leading construction projects in Soweto, managing teams, ensuring safety compliance.",
-    requirements:
-      "5+ years construction experience, leadership skills, safety certification",
+    description: "Leading construction projects in Soweto.",
+    requirements: "5+ years experience",
     category: "job",
-    benefits: ["Medical Aid", "Provident Fund", "Training", "Growth Opportunities"]
+    benefits: ["Medical Aid", "Provident Fund"]
   },
   {
     id: 2,
@@ -116,35 +100,84 @@ export const featuredJobs = [
     matches: "88% match",
     urgent: false,
     posted: "1 day ago",
-    skills: ["Management", "Logistics", "Inventory", "Operations"],
+    skills: ["Management", "Logistics"],
     industry: "Logistics",
-    description:
-      "Oversee warehouse operations and manage inventory.",
-    requirements:
-      "Warehouse experience, management skills, inventory knowledge",
+    description: "Oversee warehouse operations.",
+    requirements: "Warehouse experience",
     category: "job",
-    benefits: ["Performance Bonus", "Transport Allowance", "Medical Insurance"]
+    benefits: ["Performance Bonus"]
+  }
+];
+
+
+// ==========================
+// Networking Tips
+// ==========================
+export const networkingTips = [
+  "Complete your profile to attract employers",
+  "Connect with verified recruiters",
+  "Share your journey and achievements",
+  "Stay active on the platform"
+];
+
+
+// ==========================
+// Rehabilitation Timeline
+// ==========================
+export const rehabilitationTimeline = [
+  {
+    id: 1,
+    year: "2019",
+    event: "Incarceration Begins",
+    description: "Started sentence",
+    status: "incarcerated",
+    icon: "🔒",
+    color: "#ef4444"
   },
   {
-    id: 3,
-    title: "Construction Learnership",
-    company: "WBHO Construction",
-    logo: ConstructionCoLogo,
-    location: "Pretoria",
-    salary: "R8,000 - R12,000",
-    type: "Learnership",
-    matches: "92% match",
-    urgent: true,
-    posted: "1 day ago",
-    skills: ["Willing to Learn", "Teamwork"],
-    industry: "Construction",
-    description:
-      "12-month learnership program with on-the-job training.",
-    requirements:
-      "Matric certificate, no experience required",
-    category: "learnership",
-    benefits: ["NQF Certification", "Stipend", "Mentorship"]
+    id: 2,
+    year: "2023",
+    event: "Release Date",
+    description: "Joined RE-Link platform",
+    status: "post",
+    icon: "🎉",
+    color: "#10b981"
   }
+];
+
+
+// ==========================
+// Conversations
+// ==========================
+export const conversations = [
+  {
+    id: 1,
+    employer: "BuildRight Construction",
+    logo: BuildRightLogo,
+    lastMessage: "We'd like to schedule an interview...",
+    time: "10:30 AM",
+    unread: true,
+    verified: true,
+    messages: []
+  }
+];
+
+
+// ==========================
+// Credibility Metrics
+// ==========================
+export const credibilityMetrics = [
+  { label: "Skills & Employability", score: 85, color: "#10b981" },
+  { label: "Rehabilitation Engagement", score: 72, color: "#059669" }
+];
+
+
+// ==========================
+// Referral Types
+// ==========================
+export const referralTypes = [
+  { id: "employer", label: "Previous Employer", points: 15 },
+  { id: "education", label: "Education/Training", points: 18 }
 ];
 
 
@@ -155,32 +188,31 @@ export const industries = [
   "All Industries",
   "Construction",
   "Logistics",
-  "Customer Service",
-  "Manufacturing",
-  "Retail",
-  "Hospitality",
-  "Security",
-  "Technology",
-  "Healthcare"
+  "Retail"
 ];
 
 export const locations = [
   "All Locations",
   "Johannesburg",
   "Soweto",
-  "Cape Town",
-  "Durban",
-  "Pretoria",
-  "Remote"
+  "Cape Town"
 ];
 
 export const salaryRanges = [
   "All Ranges",
   "R8,000 - R12,000",
   "R12,000 - R18,000",
-  "R18,000 - R25,000",
-  "R25,000 - R35,000",
-  "R35,000+"
+  "R18,000 - R25,000"
+];
+
+export const availabilityOptions = [
+  "All",
+  "Immediate",
+  "1-2 Weeks",
+  "1 Month",
+  "Flexible",
+  "Part-time",
+  "Weekends Only"
 ];
 
 export const jobTypes = [
@@ -188,13 +220,12 @@ export const jobTypes = [
   "Full-time",
   "Part-time",
   "Contract",
-  "Temporary",
   "Remote"
 ];
 
 
 // ==========================
-// Job Categories (FIXED)
+// Job Categories
 // ==========================
 export const jobCategories = [
   { id: "All", label: "All Opportunities", icon: Briefcase },
@@ -203,3 +234,21 @@ export const jobCategories = [
   { id: "volunteer", label: "Volunteer Work", icon: HandHeart },
   { id: "internship", label: "Internships", icon: BookOpen }
 ];
+
+
+// ==========================
+// Post Type Options
+// ==========================
+export const postTypeOptions = {
+  "ex-convict": [
+    { value: "journey", label: "My Journey", icon: "🚶" },
+    { value: "achievement", label: "Achievement", icon: "🏆" }
+  ],
+  recruiter: [
+    { value: "opportunity", label: "Job Opportunity", icon: "💼" },
+    { value: "company", label: "Company Update", icon: "🏢" }
+  ],
+  default: [
+    { value: "quote", label: "Motivational Quote", icon: "💭" }
+  ]
+};

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Home as HomeIcon, Briefcase, MessageCircle, Users, User,
-  BarChart3, LogOut, Trash2, Sun, Moon
+  BarChart3, LogOut, Trash2, Sun, Moon,GraduationCap
 } from "lucide-react";
 
 // Import all subcomponents
